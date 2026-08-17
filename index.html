@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EDO WATCHES — Montres de luxe à Aix-en-Provence | Rolex, Patek Philippe, Audemars Piguet</title>
+  <meta name="description" content="Maison aixoise de montres de luxe, neuves et pièces de collection : Rolex, Patek Philippe, Audemars Piguet, Cartier, Omega. Authenticité certifiée, set complet, sur rendez-vous à Aix-en-Provence.">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A0A0A'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='18' fill='%23FAFAF8'%3EE%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            noir: '#0A0A0A',
+            ivoire: '#FAFAF8',
+            gris: '#6B6B6B',
+            platine: '#C8C4BC',
+          },
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          letterSpacing: {
+            luxe: '0.25em',
+            logo: '0.35em',
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::selection { background: #0A0A0A; color: #FAFAF8; }
+    .dark-section ::selection { background: #FAFAF8; color: #0A0A0A; }
+
+    /* Apparition au scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.9s ease-out, transform 0.9s ease-out;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      * { animation: none !important; }
+    }
+
+    /* Zoom lent sur les images */
+    .img-zoom { overflow: hidden; }
+    .img-zoom img { transition: transform 0.8s ease-out; }
+    .img-zoom:hover img { transform: scale(1.03); }
+
+    /* Boutons */
+    .btn {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      border: 1px solid currentColor;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+    .btn-blanc { background: #FAFAF8; color: #0A0A0A; border-color: #FAFAF8; }
+    .btn-blanc:hover { background: transparent; color: #FAFAF8; }
+    .btn-contour-blanc { color: #FAFAF8; }
+    .btn-contour-blanc:hover { background: #FAFAF8; color: #0A0A0A; }
+    .btn-contour-noir { color: #0A0A0A; }
+    .btn-contour-noir:hover { background: #0A0A0A; color: #FAFAF8; }
+
+    /* Champs de formulaire soulignés */
+    .champ {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid rgba(200, 196, 188, 0.35);
+      padding: 0.9rem 0;
+      font-size: 15px;
+      color: #FAFAF8;
+      transition: border-color 0.4s ease;
+      border-radius: 0;
+    }
+    .champ::placeholder { color: #6B6B6B; }
+    .champ:focus { outline: none; border-bottom-color: #C8C4BC; }
+
+    /* Focus clavier visible */
+    a:focus-visible, button:focus-visible {
+      outline: 1px solid #C8C4BC;
+      outline-offset: 4px;
+    }
+
+    /* Indicateur de scroll */
+    @keyframes ligne-scroll {
+      0% { transform: scaleY(0); transform-origin: top; }
+      45% { transform: scaleY(1); transform-origin: top; }
+      55% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+    .ligne-scroll { animation: ligne-scroll 2.4s ease-in-out infinite; }
+
+    /* Galerie horizontale sans barre de défilement visible */
+    .galerie { scrollbar-width: none; -ms-overflow-style: none; }
+    .galerie::-webkit-scrollbar { display: none; }
+
+    /* Lien découvrir au hover des produits */
+    .carte-produit .decouvrir { opacity: 0; transform: translateY(6px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .carte-produit:hover .decouvrir, .carte-produit:focus-within .decouvrir { opacity: 1; transform: translateY(0); }
+
+    /* Noir & blanc strict sur toutes les photos */
+    img { filter: grayscale(100%) contrast(1.04); }
+
+    /* Header raffiné */
+    .lien-nav { position: relative; padding-bottom: 4px; white-space: nowrap; }
+    .lien-nav::after {
+      content: '';
+      position: absolute; left: 0; bottom: 0;
+      height: 1px; width: 100%; background: currentColor;
+      transform: scaleX(0); transform-origin: right;
+      transition: transform 0.45s ease;
+    }
+    .lien-nav:hover::after, .lien-nav[aria-expanded="true"]::after { transform: scaleX(1); transform-origin: left; }
+    .chevron { transition: transform 0.4s ease; }
+    [aria-expanded="true"] .chevron { transform: rotate(180deg); }
+    .mega {
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s;
+    }
+    .mega.ouverte { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
+
+    html { -webkit-font-smoothing: antialiased; }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "EDO WATCHES",
+    "description": "Maison de vente de montres de luxe, neuves et pièces de collection, à Aix-en-Provence. Sur rendez-vous.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "10, cours Mirabeau",
+      "postalCode": "13100",
+      "addressLocality": "Aix-en-Provence",
+      "addressCountry": "FR"
+    },
+    "openingHours": "Tu-Sa 10:00-19:00",
+    "priceRange": "€€€€"
+  }
+  </script>
+</head>
+
+<body class="bg-ivoire text-noir font-sans antialiased">
+
+  <!-- ============ HEADER ============ -->
+  <header id="header" data-transparent class="fixed inset-x-0 top-0 z-50 text-ivoire transition-colors duration-500">
+    <!-- Barre supérieure -->
+    <div class="hidden lg:block border-b border-white/10">
+      <div class="mx-auto max-w-[1400px] px-6 lg:px-12 h-9 flex items-center justify-center text-[10px] tracking-luxe uppercase text-white/50">
+        <p>Aix-en-Provence — Sur rendez-vous</p>
+      </div>
+    </div>
+
+    <!-- Barre principale -->
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
+      <div class="grid grid-cols-[1fr_auto_1fr] items-center h-20 lg:h-24">
+        <nav class="hidden xl:flex items-center gap-9 text-[11px] tracking-luxe uppercase" aria-label="Navigation principale">
+          <button id="decl-mega" class="lien-nav flex items-center gap-2 uppercase tracking-luxe" aria-expanded="false" aria-controls="mega">
+            Collection
+            <svg class="chevron" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1"><path d="m2 3.5 3 3 3-3"/></svg>
+          </button>
+          <a href="collection.html" class="lien-nav">Catalogue</a>
+          <a href="#maison" class="lien-nav">La Maison</a>
+          <a href="#vendre" class="lien-nav">Vendre</a>
+        </nav>
+
+        <button id="burger" class="xl:hidden justify-self-start p-2 -ml-2" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="menu-mobile">
+          <span class="block w-6 h-px bg-current mb-2"></span>
+          <span class="block w-6 h-px bg-current"></span>
+        </button>
+
+        <a href="index.html" class="text-center leading-none">
+          <span class="block font-serif text-xl lg:text-2xl tracking-logo uppercase">Edo&nbsp;Watches</span>
+          <span class="mt-2 hidden lg:block text-[8px] tracking-[0.45em] uppercase text-white/50">Maison horlogère — Aix-en-Provence</span>
+        </a>
+
+        <div class="flex items-center justify-end gap-7">
+          <a href="#contact" class="hidden xl:inline-block text-[11px] tracking-luxe uppercase border-b border-white/40 pb-1 hover:border-platine hover:text-platine transition-colors duration-400">Prendre rendez-vous</a>
+          <a href="https://wa.me/33600000000" class="hover:text-platine transition-colors duration-400" aria-label="Nous contacter sur WhatsApp">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mega menu marques -->
+    <div id="mega" class="mega hidden xl:block absolute inset-x-0 top-full bg-ivoire text-noir border-b border-platine/40 max-h-[calc(100vh-8.25rem)] overflow-y-auto">
+      <div class="mx-auto max-w-[1400px] px-8 lg:px-12 py-14 grid lg:grid-cols-[260px_1fr] gap-10 xl:gap-16 items-start">
+        <div>
+          <p class="text-[11px] tracking-luxe uppercase text-gris mb-6">Nos marques</p>
+          <p class="font-serif text-3xl font-light leading-snug">Les plus grandes <em class="italic">maisons</em>, authentifiées.</p>
+          <p class="mt-5 text-[13px] text-gris leading-[1.7]">Chaque pièce est expertisée par nos horlogers et livrée en set complet. Une référence vous échappe ? Nous la sourçons.</p>
+          <a href="collection.html" class="inline-block mt-8 text-[11px] tracking-luxe uppercase border-b border-noir pb-1 hover:text-gris hover:border-gris transition-colors duration-400">Voir plus de marques →</a>
+        </div>
+        <div id="mega-grille" class="grid grid-cols-3 xl:grid-cols-5 border-l border-t border-platine/30"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Menu mobile plein écran -->
+  <div id="menu-mobile" class="fixed inset-0 z-40 bg-noir text-ivoire flex-col hidden overflow-y-auto" role="dialog" aria-label="Menu">
+    <div class="pt-28 pb-16 px-8">
+      <nav class="flex flex-col gap-7">
+        <button id="decl-marques-mobile" class="flex items-center justify-between w-full text-left font-serif text-3xl font-light" aria-expanded="false" aria-controls="sous-marques">
+          Collection
+          <svg class="chevron" width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1"><path d="m2 3.5 3 3 3-3"/></svg>
+        </button>
+        <div id="sous-marques" class="hidden -mt-3">
+          <div id="marques-mobile" class="grid grid-cols-2 gap-x-6"></div>
+          <a href="collection.html" class="inline-block mt-5 text-[11px] tracking-luxe uppercase border-b border-white/40 pb-1">Voir tout le catalogue &#8594;</a>
+        </div>
+        <a href="collection.html" class="font-serif text-3xl font-light">Catalogue</a>
+        <a href="#maison" class="font-serif text-3xl font-light">La Maison</a>
+        <a href="#vendre" class="font-serif text-3xl font-light">Vendre sa montre</a>
+        <a href="#contact" class="font-serif text-3xl font-light">Contact</a>
+      </nav>
+      <p class="text-[11px] tracking-luxe uppercase text-gris mt-12">Aix-en-Provence — sur rendez-vous</p>
+    </div>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <section class="relative h-screen min-h-[640px] flex items-center justify-center text-center text-ivoire dark-section" id="hero">
+    <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?q=80&w=2000&auto=format&fit=crop"
+         alt="Gros plan sur le cadran d'une montre de luxe sur fond noir"
+         class="absolute inset-0 w-full h-full object-cover" fetchpriority="high">
+    <div class="absolute inset-0 bg-noir/60"></div>
+
+    <div class="relative z-10 px-6 max-w-4xl">
+      <p class="text-[11px] tracking-luxe uppercase text-platine mb-8"><span class="whitespace-nowrap">Aix-en-Provence</span> — <span class="whitespace-nowrap">Sur rendez-vous</span></p>
+      <h1 class="font-serif font-light leading-none tracking-tight" style="font-size: clamp(3rem, 8vw, 7rem);">
+        L'exception, <em class="italic">mesurée</em>.
+      </h1>
+      <p class="mt-8 text-gris text-[15px] lg:text-base leading-[1.7] max-w-md mx-auto text-neutral-300">
+        Chaque pièce authentifiée, garantie et livrée en set complet.
+      </p>
+      <div class="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="#collection" class="btn btn-blanc">Découvrir la collection</a>
+        <a href="#contact" class="btn btn-contour-blanc">Nous contacter</a>
+      </div>
+    </div>
+
+    <!-- Indicateur de scroll -->
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3" aria-hidden="true">
+      <span class="text-[10px] tracking-luxe uppercase text-neutral-400">Défiler</span>
+      <span class="block w-px h-12 bg-ivoire/50 ligne-scroll"></span>
+    </div>
+  </section>
+
+  <!-- ============ RÉASSURANCE ============ -->
+  <section class="bg-ivoire">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-12 py-24 lg:py-32">
+      <div class="grid md:grid-cols-3 reveal">
+
+        <div class="px-4 lg:px-12 py-10 md:py-4 text-center border-b md:border-b-0 md:border-r border-platine/40">
+          <svg class="mx-auto mb-6" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="0.8"><path d="M12 2 4 6v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V6l-8-4z"/><path d="m9 12 2 2 4-4"/></svg>
+          <h3 class="font-serif text-xl font-normal mb-3">Authenticité certifiée</h3>
+          <p class="text-gris text-[15px] leading-[1.7]">Chaque référence est contrôlée par nos horlogers avant sa mise en vente. Provenance documentée.</p>
+        </div>
+
+        <div class="px-4 lg:px-12 py-10 md:py-4 text-center border-b md:border-b-0 md:border-r border-platine/40">
+          <svg class="mx-auto mb-6" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="0.8"><rect x="2" y="6" width="20" height="13" rx="1"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+          <h3 class="font-serif text-xl font-normal mb-3">Paiement &amp; livraison assurés</h3>
+          <p class="text-gris text-[15px] leading-[1.7]">Transaction sécurisée, remise en main propre à Aix-en-Provence ou transport assuré à valeur déclarée.</p>
+        </div>
+
+        <div class="px-4 lg:px-12 py-10 md:py-4 text-center">
+          <svg class="mx-auto mb-6" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="0.8"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg>
+          <h3 class="font-serif text-xl font-normal mb-3">Reprise et échange</h3>
+          <p class="text-gris text-[15px] leading-[1.7]">Votre montre peut être reprise ou intégrée dans un échange, après estimation par nos soins.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SÉLECTION ============ -->
+  <section id="collection" class="bg-ivoire border-t border-platine/30">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-12 py-28 lg:py-40">
+
+      <div class="max-w-xl reveal">
+        <p class="text-[11px] tracking-luxe uppercase text-gris mb-6">Collection</p>
+        <h2 class="font-serif font-light tracking-tight" style="font-size: clamp(2.25rem, 4.5vw, 4rem);">Notre <em class="italic">sélection</em></h2>
+        <p class="mt-6 text-gris text-[15px] leading-[1.7]">
+          Six pièces choisies pour leur état, leur provenance et leur set complet.
+          La collection évolue chaque semaine, en ligne et sur rendez-vous.
+        </p>
+      </div>
+
+      <div class="mt-16 lg:mt-24 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 lg:gap-y-20">
+
+        <!-- 1 -->
+        <a href="montre.html?m=daytona" class="carte-produit group block reveal">
+          <div class="img-zoom aspect-[4/5] bg-white border border-platine/30">
+            <img src="https://images.unsplash.com/photo-1587925358603-c2eea5305bbc?q=80&w=1200&auto=format&fit=crop" alt="Rolex Cosmograph Daytona en or jaune, cadran noir" loading="lazy" class="w-full h-full object-cover">
+          </div>
+          <div class="mt-6">
+            <h3 class="font-serif text-xl font-normal">Rolex Cosmograph Daytona</h3>
+            <p class="mt-1 text-[13px] text-gris">2021 · Or jaune · Réf. 116508</p>
+            <div class="mt-3 flex items-baseline justify-between">
+              <p class="text-[15px] font-light tracking-wide">42 500 €</p>
+              <span class="decouvrir text-[11px] tracking-luxe uppercase">Découvrir →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 2 -->
+        <a href="montre.html?m=submariner" class="carte-produit group block reveal">
+          <div class="img-zoom aspect-[4/5] bg-white border border-platine/30">
+            <img src="https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1200&auto=format&fit=crop" alt="Rolex Submariner Date, cadran noir, bracelet acier" loading="lazy" class="w-full h-full object-cover">
+          </div>
+          <div class="mt-6">
+            <h3 class="font-serif text-xl font-normal">Rolex Submariner Date</h3>
+            <p class="mt-1 text-[13px] text-gris">2022 · Acier Oystersteel · Réf. 126610LN</p>
+            <div class="mt-3 flex items-baseline justify-between">
+              <p class="text-[15px] font-light tracking-wide">14 500 €</p>
+              <span class="decouvrir text-[11px] tracking-luxe uppercase">Découvrir →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 3 -->
+        <a href="montre.html?m=royal-oak" class="carte-produit group block reveal">
+          <div class="img-zoom aspect-[4/5] bg-white border border-platine/30">
+            <img src="https://images.unsplash.com/photo-1609587312208-cea54be969e7?q=80&w=1200&auto=format&fit=crop" alt="Audemars Piguet Royal Oak Offshore, boîtier octogonal" loading="lazy" class="w-full h-full object-cover">
+          </div>
+          <div class="mt-6">
+            <h3 class="font-serif text-xl font-normal">Audemars Piguet Royal Oak Offshore</h3>
+            <p class="mt-1 text-[13px] text-gris">2021 · Acier · Chronographe</p>
+            <div class="mt-3 flex items-baseline justify-between">
+              <p class="text-[15px] font-light tracking-wide">38 000 €</p>
+              <span class="decouvrir text-[11px] tracking-luxe uppercase">Découvrir →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 4 -->
+        <a href="montre.html?m=explorer" class="carte-produit group block reveal">
+          <div class="img-zoom aspect-[4/5] bg-white border border-platine/30">
+            <img src="https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?q=80&w=1200&auto=format&fit=crop" alt="Rolex Explorer, cadran noir, bracelet acier Oyster" loading="lazy" class="w-full h-full object-cover">
+          </div>
+          <div class="mt-6">
+            <h3 class="font-serif text-xl font-normal">Rolex Explorer</h3>
+            <p class="mt-1 text-[13px] text-gris">2021 · Acier Oystersteel · Réf. 124270</p>
+            <div class="mt-3 flex items-baseline justify-between">
+              <p class="text-[15px] font-light tracking-wide">8 900 €</p>
+              <span class="decouvrir text-[11px] tracking-luxe uppercase">Découvrir →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 5 -->
+        <a href="montre.html?m=planet-ocean" class="carte-produit group block reveal">
+          <div class="img-zoom aspect-[4/5] bg-white border border-platine/30">
+            <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=1200&auto=format&fit=crop" alt="Omega Seamaster Planet Ocean, chronographe acier" loading="lazy" class="w-full h-full object-cover">
+          </div>
+          <div class="mt-6">
+            <h3 class="font-serif text-xl font-normal">Omega Seamaster Planet Ocean</h3>
+            <p class="mt-1 text-[13px] text-gris">2016 · Acier · Chronographe co-axial</p>
+            <div class="mt-3 flex items-baseline justify-between">
+              <p class="text-[15px] font-light tracking-wide">8 200 €</p>
+              <span class="decouvrir text-[11px] tracking-luxe uppercase">Découvrir →</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 6 -->
+        <a href="montre.html?m=datejust" class="carte-produit group block reveal">
+          <div class="img-zoom aspect-[4/5] bg-white border border-platine/30">
+            <img src="https://images.unsplash.com/photo-1620625515032-6ed0c1790c75?q=80&w=1200&auto=format&fit=crop" alt="Rolex Datejust, boîtier acier et or jaune, cadran clair" loading="lazy" class="w-full h-full object-cover">
+          </div>
+          <div class="mt-6">
+            <h3 class="font-serif text-xl font-normal">Rolex Datejust 36</h3>
+            <p class="mt-1 text-[13px] text-gris">2020 · Acier &amp; or jaune · Réf. 126233</p>
+            <div class="mt-3 flex items-baseline justify-between">
+              <p class="text-[15px] font-light tracking-wide">12 800 €</p>
+              <span class="decouvrir text-[11px] tracking-luxe uppercase">Découvrir →</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+
+      <div class="mt-20 text-center reveal">
+        <a href="collection.html" class="btn btn-contour-noir">Voir toute la collection</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LA MAISON ============ -->
+  <section id="maison" class="bg-ivoire border-t border-platine/30">
+    <div class="grid lg:grid-cols-2 items-stretch">
+      <div class="img-zoom min-h-[420px] lg:min-h-[720px]">
+        <img src="https://images.unsplash.com/photo-1526045431048-f857369baa09?q=80&w=1600&auto=format&fit=crop" alt="Montre posée sur un présentoir, lumière naturelle" loading="lazy" class="w-full h-full object-cover">
+      </div>
+      <div class="flex items-center">
+        <div class="px-6 lg:px-24 py-24 lg:py-40 max-w-xl reveal">
+          <p class="text-[11px] tracking-luxe uppercase text-gris mb-6">La Maison</p>
+          <h2 class="font-serif font-light tracking-tight" style="font-size: clamp(2.25rem, 4vw, 3.5rem);">
+            Une maison, <em class="italic">une exigence</em>
+          </h2>
+          <div class="mt-8 space-y-6 text-gris text-[15px] leading-[1.7]">
+            <p>
+              EDO WATCHES est née d'une conviction simple : une montre d'exception mérite
+              une transaction d'exception. Depuis Aix-en-Provence, nous sélectionnons des pièces neuves
+              et de collection auprès d'un réseau de sourcing international construit sur la durée.
+            </p>
+            <p>
+              Chaque référence est expertisée, ouverte, contrôlée. Nous ne vendons rien
+              que nous n'aurions acquis pour nous-mêmes. Les rencontres se font sur rendez-vous,
+              dans la plus grande discrétion.
+            </p>
+          </div>
+          <a href="#contact" class="inline-block mt-10 text-[11px] tracking-luxe uppercase border-b border-noir pb-1 hover:text-gris hover:border-gris transition-colors duration-400">
+            Prendre rendez-vous
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VENDRE OU ÉCHANGER ============ -->
+  <section id="vendre" class="bg-noir text-ivoire dark-section">
+    <div class="grid lg:grid-cols-2 items-stretch">
+      <div class="flex items-center order-2 lg:order-1">
+        <div class="px-6 lg:px-24 py-24 lg:py-44 max-w-xl reveal">
+          <p class="text-[11px] tracking-luxe uppercase text-platine mb-6">Rachat &amp; échange</p>
+          <h2 class="font-serif font-light tracking-tight" style="font-size: clamp(2.25rem, 4vw, 3.5rem);">
+            Vendre ou <em class="italic">échanger</em> sa montre
+          </h2>
+          <div class="mt-8 space-y-6 text-neutral-400 text-[15px] leading-[1.7]">
+            <p>
+              Vous détenez une pièce dont vous souhaitez vous séparer.
+              Envoyez-nous ses photos et sa référence : nous vous adressons
+              une estimation gratuite sous 24 heures.
+            </p>
+            <p>
+              La transaction se déroule à notre bureau ou à distance, en toute discrétion.
+              Le paiement est immédiat, dès l'expertise validée.
+            </p>
+          </div>
+          <ul class="mt-10 space-y-4 text-[13px] tracking-wide">
+            <li class="flex items-center gap-4"><span class="block w-8 h-px bg-platine"></span>Estimation gratuite sous 24 h</li>
+            <li class="flex items-center gap-4"><span class="block w-8 h-px bg-platine"></span>Transaction discrète, à Aix-en-Provence ou à distance</li>
+            <li class="flex items-center gap-4"><span class="block w-8 h-px bg-platine"></span>Paiement immédiat après expertise</li>
+          </ul>
+          <a href="https://wa.me/33600000000" class="btn btn-contour-blanc mt-12">Obtenir une estimation</a>
+        </div>
+      </div>
+      <div class="img-zoom min-h-[420px] lg:min-h-[720px] order-1 lg:order-2">
+        <img src="https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=1600&auto=format&fit=crop" alt="Montre de collection en gros plan sur fond sombre" loading="lazy" class="w-full h-full object-cover">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GALERIE / SAVOIR-FAIRE ============ -->
+  <section class="bg-noir dark-section pb-px" aria-label="Galerie">
+    <div class="galerie flex overflow-x-auto snap-x snap-mandatory">
+      <figure class="img-zoom shrink-0 w-[85vw] sm:w-[60vw] lg:w-[38vw] aspect-[4/5] snap-start">
+        <img src="https://images.unsplash.com/photo-1548171915-e79a380a2a4b?q=80&w=1400&auto=format&fit=crop" alt="Macro d'un cadran de montre de plongée, lunette graduée" loading="lazy" class="w-full h-full object-cover">
+      </figure>
+      <figure class="img-zoom shrink-0 w-[85vw] sm:w-[60vw] lg:w-[38vw] aspect-[4/5] snap-start">
+        <img src="https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?q=80&w=1400&auto=format&fit=crop" alt="Montre au poignet, lumière rasante" loading="lazy" class="w-full h-full object-cover">
+      </figure>
+      <figure class="img-zoom shrink-0 w-[85vw] sm:w-[60vw] lg:w-[38vw] aspect-[4/5] snap-start">
+        <img src="https://images.unsplash.com/photo-1585123334904-845d60e97b29?q=80&w=1400&auto=format&fit=crop" alt="Détail d'un bracelet de montre en acier" loading="lazy" class="w-full h-full object-cover">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ TÉMOIGNAGES ============ -->
+  <section class="bg-ivoire">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-12 py-28 lg:py-44">
+      <p class="text-[11px] tracking-luxe uppercase text-gris text-center mb-20 reveal">Ils nous font confiance</p>
+      <div class="grid md:grid-cols-3 gap-16 lg:gap-12">
+
+        <blockquote class="text-center md:text-left reveal">
+          <p class="font-serif italic text-2xl font-light leading-snug">« Une Daytona introuvable ailleurs, livrée en set complet, sans une question laissée sans réponse. »</p>
+          <footer class="mt-6 text-[11px] tracking-luxe uppercase text-gris">A. Meyer — Aix-en-Provence</footer>
+        </blockquote>
+
+        <blockquote class="text-center md:text-left reveal">
+          <p class="font-serif italic text-2xl font-light leading-snug">« Estimation reçue le lendemain, paiement le jour du rendez-vous. Tout était simple et net. »</p>
+          <footer class="mt-6 text-[11px] tracking-luxe uppercase text-gris">L. Fontaine — Genève</footer>
+        </blockquote>
+
+        <blockquote class="text-center md:text-left reveal">
+          <p class="font-serif italic text-2xl font-light leading-snug">« Un vrai regard d'expert et une discrétion totale. Ma Nautilus vient de chez eux, la prochaine aussi. »</p>
+          <footer class="mt-6 text-[11px] tracking-luxe uppercase text-gris">K. Alaoui — Bruxelles</footer>
+        </blockquote>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" class="bg-noir text-ivoire dark-section">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-12 py-28 lg:py-44">
+      <div class="grid lg:grid-cols-2 gap-20 lg:gap-32">
+
+        <!-- Coordonnées -->
+        <div class="reveal">
+          <p class="text-[11px] tracking-luxe uppercase text-platine mb-6">Contact</p>
+          <h2 class="font-serif font-light tracking-tight" style="font-size: clamp(2.25rem, 4vw, 3.5rem);">
+            Sur <em class="italic">rendez-vous</em>
+          </h2>
+          <div class="mt-10 space-y-8 text-[15px] leading-[1.7] text-neutral-400">
+            <div>
+              <p class="text-[11px] tracking-luxe uppercase text-ivoire mb-2">Adresse</p>
+              <p>10, cours Mirabeau<br>13100 Aix-en-Provence</p>
+            </div>
+            <div>
+              <p class="text-[11px] tracking-luxe uppercase text-ivoire mb-2">Horaires</p>
+              <p>Du mardi au samedi, 10 h — 19 h<br>Uniquement sur rendez-vous</p>
+            </div>
+          </div>
+          <div class="mt-12 flex flex-wrap gap-4">
+            <a href="https://wa.me/33600000000" class="btn btn-contour-blanc">WhatsApp</a>
+            <a href="tel:+33100000000" class="btn btn-contour-blanc">Téléphone</a>
+            <a href="mailto:contact@edowatches.com" class="btn btn-contour-blanc">Email</a>
+          </div>
+        </div>
+
+        <!-- Formulaire -->
+        <form class="reveal flex flex-col justify-center" action="mailto:contact@edowatches.com" method="post" enctype="text/plain">
+          <div class="space-y-8">
+            <div>
+              <label for="nom" class="sr-only">Nom</label>
+              <input id="nom" name="nom" type="text" class="champ" placeholder="Nom" autocomplete="name" required>
+            </div>
+            <div>
+              <label for="email" class="sr-only">Email</label>
+              <input id="email" name="email" type="email" class="champ" placeholder="Email" autocomplete="email" required>
+            </div>
+            <div>
+              <label for="message" class="sr-only">Message</label>
+              <textarea id="message" name="message" rows="4" class="champ resize-none" placeholder="Votre message — pièce recherchée, montre à vendre, demande de rendez-vous" required></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-blanc mt-12 self-start">Envoyer</button>
+        </form>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="bg-noir text-ivoire dark-section border-t border-white/10">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-12 pt-20 pb-10">
+
+      <div class="grid md:grid-cols-[2fr_1fr_1fr_2fr] gap-12 md:gap-8">
+        <div>
+          <p class="font-serif text-lg tracking-logo uppercase">Edo&nbsp;Watches</p>
+          <p class="mt-4 text-[13px] text-gris leading-[1.7] max-w-[260px]">Montres de luxe, neuves et pièces de collection. Aix-en-Provence, sur rendez-vous.</p>
+        </div>
+
+        <nav aria-label="Liens du site">
+          <p class="text-[11px] tracking-luxe uppercase text-gris mb-5">Maison</p>
+          <ul class="space-y-3 text-[13px]">
+            <li><a href="collection.html" class="hover:text-platine transition-colors duration-400">Collection</a></li>
+            <li><a href="#maison" class="hover:text-platine transition-colors duration-400">La Maison</a></li>
+            <li><a href="#vendre" class="hover:text-platine transition-colors duration-400">Vendre sa montre</a></li>
+          </ul>
+        </nav>
+
+        <nav aria-label="Liens légaux">
+          <p class="text-[11px] tracking-luxe uppercase text-gris mb-5">Informations</p>
+          <ul class="space-y-3 text-[13px]">
+            <li><a href="#contact" class="hover:text-platine transition-colors duration-400">Contact</a></li>
+            <li><a href="#" class="hover:text-platine transition-colors duration-400">Mentions légales</a></li>
+            <li><a href="#" class="hover:text-platine transition-colors duration-400">Confidentialité</a></li>
+          </ul>
+        </nav>
+
+        <div>
+          <p class="text-[11px] tracking-luxe uppercase text-gris mb-5">Newsletter</p>
+          <form class="flex items-end gap-4 border-b border-white/20 pb-2 focus-within:border-platine transition-colors duration-400">
+            <label for="newsletter" class="sr-only">Votre email</label>
+            <input id="newsletter" type="email" placeholder="Votre email" class="flex-1 bg-transparent text-[13px] placeholder:text-gris focus:outline-none py-1">
+            <button type="submit" class="text-[11px] tracking-luxe uppercase hover:text-platine transition-colors duration-400">S'inscrire</button>
+          </form>
+          <div class="mt-8 flex gap-6 text-[11px] tracking-luxe uppercase text-gris">
+            <a href="#" class="hover:text-platine transition-colors duration-400">Instagram</a>
+            <a href="#" class="hover:text-platine transition-colors duration-400">Chrono24</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-20 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-gris tracking-wide">
+        <p>© 2026 EDO WATCHES — Tous droits réservés</p>
+        <p>EDO WATCHES est indépendante des marques citées.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="montres.js"></script>
+  <script src="site.js"></script>
+  <script>
+    // Apparition au scroll
+    const observer = new IntersectionObserver((entrees) => {
+      entrees.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EDO WATCHES — La Collection | Montres de luxe à Aix-en-Provence</title>
+  <meta name="description" content="Toutes nos montres de luxe disponibles : Rolex, Audemars Piguet, Omega, IWC… Filtrez par marque, budget, couleur de cadran et matière. Sur rendez-vous à Aix-en-Provence.">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A0A0A'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='18' fill='%23FAFAF8'%3EE%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            noir: '#0A0A0A',
+            ivoire: '#FAFAF8',
+            gris: '#6B6B6B',
+            platine: '#C8C4BC',
+          },
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          letterSpacing: {
+            luxe: '0.25em',
+            logo: '0.35em',
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::selection { background: #0A0A0A; color: #FAFAF8; }
+    .dark-section ::selection { background: #FAFAF8; color: #0A0A0A; }
+
+    /* Noir & blanc strict sur toutes les photos */
+    img { filter: grayscale(100%) contrast(1.04); }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.9s ease-out, transform 0.9s ease-out;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      * { animation: none !important; }
+    }
+
+    .img-zoom { overflow: hidden; }
+    .img-zoom img { transition: transform 0.8s ease-out; }
+    .img-zoom:hover img { transform: scale(1.03); }
+
+    .btn {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      border: 1px solid currentColor;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+    .btn-noir { background: #0A0A0A; color: #FAFAF8; border-color: #0A0A0A; }
+    .btn-noir:hover { background: transparent; color: #0A0A0A; }
+    .btn-contour-noir { color: #0A0A0A; }
+    .btn-contour-noir:hover { background: #0A0A0A; color: #FAFAF8; }
+
+    a:focus-visible, button:focus-visible, select:focus-visible {
+      outline: 1px solid #C8C4BC;
+      outline-offset: 4px;
+    }
+
+    .carte-produit .decouvrir { opacity: 0; transform: translateY(6px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .carte-produit:hover .decouvrir, .carte-produit:focus-within .decouvrir { opacity: 1; transform: translateY(0); }
+
+    /* Header raffiné */
+    .lien-nav { position: relative; padding-bottom: 4px; white-space: nowrap; }
+    .lien-nav::after {
+      content: '';
+      position: absolute; left: 0; bottom: 0;
+      height: 1px; width: 100%; background: currentColor;
+      transform: scaleX(0); transform-origin: right;
+      transition: transform 0.45s ease;
+    }
+    .lien-nav:hover::after, .lien-nav[aria-expanded="true"]::after { transform: scaleX(1); transform-origin: left; }
+    .chevron { transition: transform 0.4s ease; }
+    [aria-expanded="true"] .chevron { transform: rotate(180deg); }
+    .mega {
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s;
+    }
+    .mega.ouverte { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
+
+    /* Filtres : selects épurés, soulignés */
+    .filtre {
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9' viewBox='0 0 10 10'%3E%3Cpath d='m2 3.5 3 3 3-3' fill='none' stroke='%230A0A0A' stroke-width='1'/%3E%3C/svg%3E") no-repeat right 2px center;
+      border: 0;
+      border-bottom: 1px solid rgba(10, 10, 10, 0.25);
+      border-radius: 0;
+      padding: 0.7rem 1.4rem 0.7rem 0;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #0A0A0A;
+      cursor: pointer;
+      transition: border-color 0.4s ease;
+      max-width: 100%;
+    }
+    .filtre:hover, .filtre:focus { border-bottom-color: #0A0A0A; outline: none; }
+
+    /* Apparition des cartes filtrées */
+    @keyframes carte-in {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .carte-in { animation: carte-in 0.7s ease-out both; }
+
+    html { -webkit-font-smoothing: antialiased; }
+  </style>
+</head>
+
+<body class="bg-ivoire text-noir font-sans antialiased">
+
+  <!-- ============ HEADER ============ -->
+  <header id="header" class="fixed inset-x-0 top-0 z-50 text-ivoire bg-noir transition-colors duration-500">
+    <!-- Barre supérieure -->
+    <div class="hidden lg:block border-b border-white/10">
+      <div class="mx-auto max-w-[1400px] px-6 lg:px-12 h-9 flex items-center justify-center text-[10px] tracking-luxe uppercase text-white/50">
+        <p>Aix-en-Provence — Sur rendez-vous</p>
+      </div>
+    </div>
+
+    <!-- Barre principale -->
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
+      <div class="grid grid-cols-[1fr_auto_1fr] items-center h-20 lg:h-24">
+        <nav class="hidden xl:flex items-center gap-9 text-[11px] tracking-luxe uppercase" aria-label="Navigation principale">
+          <button id="decl-mega" class="lien-nav flex items-center gap-2 uppercase tracking-luxe" aria-expanded="false" aria-controls="mega">
+            Collection
+            <svg class="chevron" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1"><path d="m2 3.5 3 3 3-3"/></svg>
+          </button>
+          <a href="collection.html" class="lien-nav">Catalogue</a>
+          <a href="index.html#maison" class="lien-nav">La Maison</a>
+          <a href="index.html#vendre" class="lien-nav">Vendre</a>
+        </nav>
+
+        <button id="burger" class="xl:hidden justify-self-start p-2 -ml-2" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="menu-mobile">
+          <span class="block w-6 h-px bg-current mb-2"></span>
+          <span class="block w-6 h-px bg-current"></span>
+        </button>
+
+        <a href="index.html" class="text-center leading-none">
+          <span class="block font-serif text-xl lg:text-2xl tracking-logo uppercase">Edo&nbsp;Watches</span>
+          <span class="mt-2 hidden lg:block text-[8px] tracking-[0.45em] uppercase text-white/50">Maison horlogère — Aix-en-Provence</span>
+        </a>
+
+        <div class="flex items-center justify-end gap-7">
+          <a href="index.html#contact" class="hidden xl:inline-block text-[11px] tracking-luxe uppercase border-b border-white/40 pb-1 hover:border-platine hover:text-platine transition-colors duration-400">Prendre rendez-vous</a>
+          <a href="https://wa.me/33600000000" class="hover:text-platine transition-colors duration-400" aria-label="Nous contacter sur WhatsApp">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mega menu marques -->
+    <div id="mega" class="mega hidden xl:block absolute inset-x-0 top-full bg-ivoire text-noir border-b border-platine/40 max-h-[calc(100vh-8.25rem)] overflow-y-auto">
+      <div class="mx-auto max-w-[1400px] px-8 lg:px-12 py-14 grid lg:grid-cols-[260px_1fr] gap-10 xl:gap-16 items-start">
+        <div>
+          <p class="text-[11px] tracking-luxe uppercase text-gris mb-6">Nos marques</p>
+          <p class="font-serif text-3xl font-light leading-snug">Les plus grandes <em class="italic">maisons</em>, authentifiées.</p>
+          <p class="mt-5 text-[13px] text-gris leading-[1.7]">Chaque pièce est expertisée par nos horlogers et livrée en set complet. Une référence vous échappe ? Nous la sourçons.</p>
+          <a href="collection.html" class="inline-block mt-8 text-[11px] tracking-luxe uppercase border-b border-noir pb-1 hover:text-gris hover:border-gris transition-colors duration-400">Voir plus de marques →</a>
+        </div>
+        <div id="mega-grille" class="grid grid-cols-3 xl:grid-cols-5 border-l border-t border-platine/30"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Menu mobile plein écran -->
+  <div id="menu-mobile" class="fixed inset-0 z-40 bg-noir text-ivoire flex-col hidden overflow-y-auto" role="dialog" aria-label="Menu">
+    <div class="pt-28 pb-16 px-8">
+      <nav class="flex flex-col gap-7">
+        <button id="decl-marques-mobile" class="flex items-center justify-between w-full text-left font-serif text-3xl font-light" aria-expanded="false" aria-controls="sous-marques">
+          Collection
+          <svg class="chevron" width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1"><path d="m2 3.5 3 3 3-3"/></svg>
+        </button>
+        <div id="sous-marques" class="hidden -mt-3">
+          <div id="marques-mobile" class="grid grid-cols-2 gap-x-6"></div>
+          <a href="collection.html" class="inline-block mt-5 text-[11px] tracking-luxe uppercase border-b border-white/40 pb-1">Voir tout le catalogue &#8594;</a>
+        </div>
+        <a href="collection.html" class="font-serif text-3xl font-light">Catalogue</a>
+        <a href="index.html#maison" class="font-serif text-3xl font-light">La Maison</a>
+        <a href="index.html#vendre" class="font-serif text-3xl font-light">Vendre sa montre</a>
+        <a href="index.html#contact" class="font-serif text-3xl font-light">Contact</a>
+      </nav>
+      <p class="text-[11px] tracking-luxe uppercase text-gris mt-12">Aix-en-Provence — sur rendez-vous</p>
+    </div>
+  </div>
+
+  <!-- ============ COLLECTION ============ -->
+  <main class="pt-20 lg:pt-[8.25rem]">
+
+    <!-- Titre -->
+    <section class="mx-auto max-w-[1400px] px-6 lg:px-12 pt-14 lg:pt-24 pb-10 lg:pb-16">
+      <p class="text-[11px] tracking-luxe uppercase text-gris mb-6 reveal">Collection</p>
+      <h1 class="font-serif font-light tracking-tight reveal" style="font-size: clamp(2.5rem, 5.5vw, 5rem);">
+        Toutes nos <em class="italic">pièces</em>
+      </h1>
+      <p class="mt-6 max-w-xl text-gris text-[15px] leading-[1.7] reveal">
+        Chaque montre est authentifiée, contrôlée et livrée en set complet.
+        La pièce que vous cherchez n'est pas en vitrine ? Nous la sourçons sur demande.
+      </p>
+    </section>
+
+    <!-- Filtres -->
+    <section class="border-y border-platine/40 bg-ivoire sticky top-20 lg:top-[8.25rem] z-30">
+      <div class="mx-auto max-w-[1400px] px-6 lg:px-12 py-5 flex flex-wrap items-center gap-x-10 gap-y-3">
+        <label class="sr-only" for="f-marque">Marque</label>
+        <select id="f-marque" class="filtre"></select>
+
+        <label class="sr-only" for="f-budget">Budget</label>
+        <select id="f-budget" class="filtre">
+          <option value="">Tous budgets</option>
+          <option value="0-10000">Moins de 10 000 €</option>
+          <option value="10000-20000">10 000 — 20 000 €</option>
+          <option value="20000-40000">20 000 — 40 000 €</option>
+          <option value="40000-999999">Plus de 40 000 €</option>
+        </select>
+
+        <label class="sr-only" for="f-couleur">Couleur du cadran</label>
+        <select id="f-couleur" class="filtre">
+          <option value="">Toutes couleurs de cadran</option>
+          <option value="Noir">Cadran noir</option>
+          <option value="Argenté">Cadran argenté</option>
+          <option value="Gris">Cadran gris</option>
+        </select>
+
+        <label class="sr-only" for="f-matiere">Matière</label>
+        <select id="f-matiere" class="filtre">
+          <option value="">Toutes matières</option>
+          <option value="Acier">Acier</option>
+          <option value="Or">Or</option>
+          <option value="Acier & or">Acier &amp; or</option>
+        </select>
+
+        <label class="sr-only" for="f-tri">Trier</label>
+        <select id="f-tri" class="filtre lg:ml-auto">
+          <option value="maison">Sélection de la maison</option>
+          <option value="prix-asc">Prix croissant</option>
+          <option value="prix-desc">Prix décroissant</option>
+          <option value="annee">Année récente</option>
+        </select>
+
+        <button id="f-reset" class="text-[11px] tracking-luxe uppercase text-gris hover:text-noir transition-colors duration-400 border-b border-transparent hover:border-noir pb-px">Réinitialiser</button>
+      </div>
+    </section>
+
+    <!-- Résultats -->
+    <section class="mx-auto max-w-[1400px] px-6 lg:px-12 py-14 lg:py-20">
+      <p id="compteur" class="text-[11px] tracking-luxe uppercase text-gris mb-12"></p>
+
+      <div id="grille-resultats" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16"></div>
+
+      <!-- État vide -->
+      <div id="etat-vide" class="hidden py-20 max-w-2xl">
+        <h2 id="vide-titre" class="font-serif font-light tracking-tight" style="font-size: clamp(1.8rem, 3.5vw, 3rem);"></h2>
+        <p class="mt-6 text-gris text-[15px] leading-[1.7]">
+          Notre vitrine évolue chaque semaine et notre réseau de sourcing couvre l'Europe et la Suisse.
+          Décrivez-nous la pièce recherchée : nous vous revenons sous 24 heures avec des propositions.
+        </p>
+        <a id="vide-cta" href="https://wa.me/33600000000" class="btn btn-noir mt-10">Lancer une recherche</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="bg-noir text-ivoire dark-section">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-12 py-14 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <a href="index.html" class="font-serif text-lg tracking-logo uppercase">Edo&nbsp;Watches</a>
+      <nav class="flex gap-8 text-[11px] tracking-luxe uppercase text-gris" aria-label="Liens du site">
+        <a href="collection.html" class="hover:text-platine transition-colors duration-400">Collection</a>
+        <a href="index.html#vendre" class="hover:text-platine transition-colors duration-400">Vendre</a>
+        <a href="index.html#contact" class="hover:text-platine transition-colors duration-400">Contact</a>
+      </nav>
+      <p class="text-[11px] text-gris tracking-wide">© 2026 EDO WATCHES</p>
+    </div>
+  </footer>
+
+  <script src="montres.js"></script>
+  <script src="site.js"></script>
+  <script>
+    // ---------- Filtres ----------
+    const selMarque = document.getElementById('f-marque');
+    const selBudget = document.getElementById('f-budget');
+    const selCouleur = document.getElementById('f-couleur');
+    const selMatiere = document.getElementById('f-matiere');
+    const selTri = document.getElementById('f-tri');
+
+    // Marques : les 15 maisons + toute marque présente en stock
+    const marquesStock = [...new Set(Object.values(MONTRES).map(m => m.marque))];
+    const toutesMarques = [...new Set([...MARQUES.map(m => m.nom), ...marquesStock])];
+    selMarque.innerHTML = '<option value="">Toutes les marques</option>' +
+      toutesMarques.map(m => `<option value="${m}">${m}</option>`).join('');
+
+    // Pré-filtre depuis l'URL (mega menu)
+    const paramMarque = new URLSearchParams(location.search).get('marque');
+    if (paramMarque && toutesMarques.includes(paramMarque)) selMarque.value = paramMarque;
+
+    const carte = ([slug, m], i) => `
+      <a href="montre.html?m=${slug}" class="carte-produit group block carte-in" style="animation-delay:${Math.min(i * 70, 500)}ms">
+        <div class="img-zoom aspect-[4/5] bg-white border border-platine/30">
+          <img src="${m.image.replace('w=1600', 'w=1200')}" alt="${m.alt}" loading="lazy" class="w-full h-full object-cover">
+        </div>
+        <div class="mt-6">
+          <h3 class="font-serif text-xl font-normal">${m.marque} ${m.nom}</h3>
+          <p class="mt-1 text-[13px] text-gris">${m.sousTitre}</p>
+          <div class="mt-3 flex items-baseline justify-between">
+            <p class="text-[15px] font-light tracking-wide">${m.prix}</p>
+            <span class="decouvrir text-[11px] tracking-luxe uppercase">Découvrir →</span>
+          </div>
+        </div>
+      </a>`;
+
+    const rendre = () => {
+      let entrees = Object.entries(MONTRES);
+
+      if (selMarque.value) entrees = entrees.filter(([, m]) => m.marque === selMarque.value);
+      if (selBudget.value) {
+        const [min, max] = selBudget.value.split('-').map(Number);
+        entrees = entrees.filter(([, m]) => m.prixNum >= min && m.prixNum < max);
+      }
+      if (selCouleur.value) entrees = entrees.filter(([, m]) => m.couleur === selCouleur.value);
+      if (selMatiere.value) entrees = entrees.filter(([, m]) => m.matiere === selMatiere.value);
+
+      if (selTri.value === 'prix-asc') entrees.sort((a, b) => a[1].prixNum - b[1].prixNum);
+      if (selTri.value === 'prix-desc') entrees.sort((a, b) => b[1].prixNum - a[1].prixNum);
+      if (selTri.value === 'annee') entrees.sort((a, b) => b[1].annee - a[1].annee);
+
+      const grille = document.getElementById('grille-resultats');
+      const vide = document.getElementById('etat-vide');
+      const compteur = document.getElementById('compteur');
+
+      grille.innerHTML = entrees.map(carte).join('');
+      compteur.textContent = entrees.length
+        ? entrees.length + (entrees.length > 1 ? ' pièces disponibles' : ' pièce disponible')
+        : '';
+      vide.classList.toggle('hidden', entrees.length > 0);
+
+      if (!entrees.length) {
+        const quoi = selMarque.value || 'correspondante';
+        document.getElementById('vide-titre').innerHTML =
+          'Aucune pièce <em class="italic">' + quoi + '</em> en vitrine actuellement.';
+        document.getElementById('vide-cta').href =
+          'https://wa.me/33600000000?text=' + encodeURIComponent(
+            'Bonjour, je recherche une montre' + (selMarque.value ? ' ' + selMarque.value : '') + '. Pouvez-vous la sourcer ?');
+      }
+
+      // L'URL reflète le filtre marque (partageable)
+      const url = new URL(location);
+      if (selMarque.value) url.searchParams.set('marque', selMarque.value);
+      else url.searchParams.delete('marque');
+      history.replaceState(null, '', url);
+    };
+
+    [selMarque, selBudget, selCouleur, selMatiere, selTri].forEach(s => s.addEventListener('change', rendre));
+    document.getElementById('f-reset').addEventListener('click', () => {
+      [selMarque, selBudget, selCouleur, selMatiere].forEach(s => s.value = '');
+      selTri.value = 'maison';
+      rendre();
+    });
+
+    rendre();
+
+    // ---------- Apparition au scroll ----------
+    const observer = new IntersectionObserver((entrees) => {
+      entrees.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
