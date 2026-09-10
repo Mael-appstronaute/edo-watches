@@ -17,7 +17,7 @@ async function chargerDonnees() {
     if (!r.ok) throw new Error('Lecture du blob impossible');
     return await r.json();
   } catch (e) {
-    if (e && (e.name === 'BlobNotFoundError' || /not.*found/i.test(String(e.message)))) {
+    if (e && (e.name === 'BlobNotFoundError' || /not.*found|does not exist/i.test(String(e.message)))) {
       await sauvegarderDonnees(graine);
       return JSON.parse(JSON.stringify(graine));
     }
