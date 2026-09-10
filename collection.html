@@ -237,20 +237,10 @@
         </select>
 
         <label class="sr-only" for="f-couleur">Couleur du cadran</label>
-        <select id="f-couleur" class="filtre">
-          <option value="">Toutes couleurs de cadran</option>
-          <option value="Noir">Cadran noir</option>
-          <option value="Argenté">Cadran argenté</option>
-          <option value="Gris">Cadran gris</option>
-        </select>
+        <select id="f-couleur" class="filtre"></select>
 
         <label class="sr-only" for="f-matiere">Matière</label>
-        <select id="f-matiere" class="filtre">
-          <option value="">Toutes matières</option>
-          <option value="Acier">Acier</option>
-          <option value="Or">Or</option>
-          <option value="Acier & or">Acier &amp; or</option>
-        </select>
+        <select id="f-matiere" class="filtre"></select>
 
         <label class="sr-only" for="f-tri">Trier</label>
         <select id="f-tri" class="filtre lg:ml-auto">
@@ -311,6 +301,14 @@
     const toutesMarques = [...new Set([...MARQUES.map(m => m.nom), ...marquesStock])];
     selMarque.innerHTML = '<option value="">Toutes les marques</option>' +
       toutesMarques.map(m => `<option value="${m}">${m}</option>`).join('');
+
+    // Couleurs et matières : options construites depuis le stock réel
+    const couleursStock = [...new Set(Object.values(MONTRES).map(m => m.couleur).filter(Boolean))];
+    selCouleur.innerHTML = '<option value="">Toutes couleurs de cadran</option>' +
+      couleursStock.map(c => `<option value="${c}">Cadran ${c.toLowerCase()}</option>`).join('');
+    const matieresStock = [...new Set(Object.values(MONTRES).map(m => m.matiere).filter(Boolean))];
+    selMatiere.innerHTML = '<option value="">Toutes matières</option>' +
+      matieresStock.map(m => `<option value="${m}">${m}</option>`).join('');
 
     // Pré-filtre depuis l'URL (mega menu)
     const paramMarque = new URLSearchParams(location.search).get('marque');

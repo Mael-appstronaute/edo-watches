@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EDO WATCHES — Dashboard</title>
+  <meta name="robots" content="noindex">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A0A0A'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='18' fill='%23FAFAF8'%3EE%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { noir: '#0A0A0A', ivoire: '#FAFAF8', gris: '#6B6B6B', platine: '#C8C4BC' },
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          letterSpacing: { luxe: '0.25em', logo: '0.35em' },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::selection { background: #0A0A0A; color: #FAFAF8; }
+    html { -webkit-font-smoothing: antialiased; }
+
+    /* Photos en noir & blanc, comme sur le site */
+    .nb img, img.nb { filter: grayscale(100%) contrast(1.04); }
+
+    .champ {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid rgba(10,10,10,0.25);
+      border-radius: 0;
+      padding: 0.65rem 0;
+      font-size: 14px;
+      color: #0A0A0A;
+      transition: border-color 0.3s ease;
+    }
+    .champ:focus { outline: none; border-bottom-color: #0A0A0A; }
+    .champ::placeholder { color: #A8A49C; }
+    select.champ {
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9' viewBox='0 0 10 10'%3E%3Cpath d='m2 3.5 3 3 3-3' fill='none' stroke='%230A0A0A' stroke-width='1'/%3E%3C/svg%3E") no-repeat right 2px center;
+      padding-right: 1.4rem;
+      cursor: pointer;
+    }
+    textarea.champ { border: 1px solid rgba(10,10,10,0.2); padding: 0.9rem 1rem; line-height: 1.7; }
+    textarea.champ:focus { border-color: #0A0A0A; }
+
+    .etiquette {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #6B6B6B;
+      margin-bottom: 2px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 2.2rem;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      border: 1px solid currentColor;
+      cursor: pointer;
+      transition: background-color 0.35s ease, color 0.35s ease, opacity 0.35s ease;
+    }
+    .btn-noir { background: #0A0A0A; color: #FAFAF8; border-color: #0A0A0A; }
+    .btn-noir:hover { background: transparent; color: #0A0A0A; }
+    .btn-contour { color: #0A0A0A; }
+    .btn-contour:hover { background: #0A0A0A; color: #FAFAF8; }
+
+    .puce {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      border: 1px solid rgba(10,10,10,0.25);
+      padding: 0.45rem 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease, opacity 0.3s;
+      user-select: none;
+    }
+    .puce:hover { background: #0A0A0A; color: #FAFAF8; }
+    .puce[data-prise="1"] { opacity: 0.3; pointer-events: none; }
+
+    .badge-auto {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #FAFAF8;
+      background: #0A0A0A;
+      padding: 2px 7px;
+      margin-left: 8px;
+      vertical-align: 2px;
+    }
+
+    .zone-depot {
+      border: 1px dashed rgba(10,10,10,0.35);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      cursor: pointer;
+    }
+    .zone-depot:hover, .zone-depot.survol { background: #fff; border-color: #0A0A0A; }
+
+    .ligne-piece { transition: background-color 0.3s ease, opacity 0.3s; }
+    .ligne-piece:hover { background: #fff; }
+    .ligne-piece.fantome { opacity: 0.3; }
+    .poignee { cursor: grab; }
+    .poignee:active { cursor: grabbing; }
+
+    .carte-produit .decouvrir { opacity: 0; transform: translateY(6px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .carte-produit:hover .decouvrir { opacity: 1; transform: translateY(0); }
+    .img-zoom { overflow: hidden; }
+    .img-zoom img { transition: transform 0.8s ease-out; }
+    .img-zoom:hover img { transform: scale(1.03); }
+
+    @keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    .toast { animation: toast-in 0.4s ease-out both; }
+
+    .interrupteur { width: 40px; height: 22px; background: rgba(10,10,10,0.2); border-radius: 999px; position: relative; transition: background-color 0.3s ease; flex: none; }
+    .interrupteur::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: #FAFAF8; border-radius: 999px; transition: transform 0.3s ease; }
+    input:checked + .interrupteur { background: #0A0A0A; }
+    input:checked + .interrupteur::after { transform: translateX(18px); }
+  </style>
+</head>
+
+<body class="bg-ivoire text-noir font-sans antialiased">
+
+  <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
+
+    <!-- ============ BARRE LATÉRALE ============ -->
+    <aside class="bg-noir text-ivoire lg:sticky lg:top-0 lg:h-screen flex flex-col">
+      <div class="px-8 pt-10 pb-8 border-b border-white/10">
+        <p class="font-serif text-xl tracking-logo uppercase">Edo&nbsp;Watches</p>
+        <p class="mt-2 text-[9px] tracking-[0.4em] uppercase text-white/40">Dashboard</p>
+      </div>
+      <nav class="px-8 py-8 flex lg:flex-col gap-6 text-[11px] tracking-luxe uppercase">
+        <button data-nav="liste" class="lien-vue text-left hover:text-platine transition-colors">La collection</button>
+        <button data-nav="form" class="lien-vue text-left text-white/50 hover:text-platine transition-colors">Ajouter une pièce</button>
+      </nav>
+      <div class="mt-auto px-8 py-8 border-t border-white/10 hidden lg:block">
+        <a href="index.html" target="_blank" class="text-[11px] tracking-luxe uppercase text-white/50 hover:text-platine transition-colors">Voir le site →</a>
+        <p id="pied-compte" class="mt-4 text-[11px] text-white/30"></p>
+      </div>
+    </aside>
+
+    <!-- ============ CONTENU ============ -->
+    <main class="px-6 lg:px-14 py-10 lg:py-14">
+
+      <!-- Bandeau serveur absent -->
+      <div id="alerte-serveur" class="hidden mb-10 border border-noir bg-white px-6 py-5 text-[13px] leading-relaxed">
+        <p class="font-medium tracking-wide uppercase text-[11px] tracking-luxe mb-2">Serveur non détecté</p>
+        Le dashboard a besoin du serveur local pour enregistrer.
+        Lancez <code class="bg-ivoire px-2 py-0.5">python server.py</code> dans le dossier du site, puis rechargez cette page.
+      </div>
+
+      <!-- ==================== VUE : COLLECTION ==================== -->
+      <section id="vue-liste">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p class="text-[11px] tracking-luxe uppercase text-gris mb-4">Dashboard</p>
+            <h1 class="font-serif font-light tracking-tight" style="font-size: clamp(2.2rem, 4vw, 3.5rem);">La <em class="italic">collection</em></h1>
+          </div>
+          <button id="btn-ajouter" class="btn btn-noir">+ Ajouter une pièce</button>
+        </div>
+
+        <!-- Statistiques -->
+        <div id="stats" class="mt-12 grid grid-cols-2 lg:grid-cols-4 border-l border-t border-platine/40"></div>
+
+        <!-- Recherche -->
+        <div class="mt-12 max-w-sm">
+          <label class="etiquette" for="recherche">Rechercher</label>
+          <input id="recherche" class="champ" placeholder="Modèle, marque, référence…">
+        </div>
+
+        <p class="mt-10 text-[11px] text-gris tracking-wide">Glissez les lignes pour changer l’ordre d’affichage du catalogue (« sélection de la maison »).</p>
+
+        <!-- Liste des pièces -->
+        <div id="liste-pieces" class="mt-4 border-t border-platine/40"></div>
+      </section>
+
+      <!-- ==================== VUE : FORMULAIRE ==================== -->
+      <section id="vue-form" class="hidden">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p class="text-[11px] tracking-luxe uppercase text-gris mb-4">
+              <button id="retour-liste" class="hover:text-noir transition-colors uppercase tracking-luxe">Collection</button>
+              <span class="mx-3">—</span><span id="fil-form">Nouvelle pièce</span>
+            </p>
+            <h1 id="titre-form" class="font-serif font-light tracking-tight" style="font-size: clamp(2.2rem, 4vw, 3.5rem);">Ajouter une <em class="italic">pièce</em></h1>
+          </div>
+        </div>
+
+        <div class="mt-12 grid xl:grid-cols-[1fr_380px] gap-14 items-start">
+
+          <!-- ---------- Formulaire ---------- -->
+          <form id="formulaire" class="space-y-14" novalidate>
+
+            <!-- Identité -->
+            <fieldset>
+              <legend class="text-[11px] tracking-luxe uppercase mb-8 border-b border-platine/40 pb-3 w-full">01 — Identité de la pièce</legend>
+              <div class="grid sm:grid-cols-2 gap-x-10 gap-y-8">
+                <div>
+                  <label class="etiquette" for="c-marque">Marque *</label>
+                  <select id="c-marque" class="champ"></select>
+                  <!-- Nouvelle marque, repliée -->
+                  <div id="bloc-nouvelle-marque" class="hidden mt-4 border border-platine/50 bg-white p-4 space-y-3">
+                    <input id="c-marque-nom" class="champ" placeholder="Nom de la maison (ex. Zenith)">
+                    <div class="flex items-center gap-3">
+                      <input id="c-marque-domaine" class="champ" placeholder="Site officiel (ex. zenith-watches.com)">
+                      <img id="apercu-logo-marque" class="h-6 w-6 object-contain hidden" alt="">
+                    </div>
+                    <p class="text-[11px] text-gris">Le logo est récupéré automatiquement depuis le site officiel.</p>
+                    <button type="button" id="btn-creer-marque" class="btn btn-contour !py-2 !px-4">Ajouter la marque</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="etiquette" for="c-nom">Modèle (titre) *</label>
+                  <input id="c-nom" class="champ" placeholder="Ex. Nautilus 5711">
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="etiquette" for="c-sous-titre">Sous-titre <span class="badge-auto" id="badge-sous-titre">auto</span></label>
+                  <input id="c-sous-titre" class="champ" placeholder="Généré automatiquement : année · matériaux · réf.">
+                  <p class="mt-2 text-[11px] text-gris">Laissez vide : il sera composé automatiquement à partir de l’année, des matériaux et de la référence.</p>
+                </div>
+              </div>
+            </fieldset>
+
+            <!-- Caractéristiques -->
+            <fieldset>
+              <legend class="text-[11px] tracking-luxe uppercase mb-8 border-b border-platine/40 pb-3 w-full">02 — Caractéristiques</legend>
+              <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8">
+                <div>
+                  <label class="etiquette" for="c-prix">Prix (€) *</label>
+                  <input id="c-prix" class="champ" type="number" min="0" step="50" placeholder="14500">
+                  <p class="mt-2 text-[11px] text-gris">Affiché : <span id="apercu-prix" class="text-noir">—</span></p>
+                </div>
+                <div>
+                  <label class="etiquette" for="c-annee">Année</label>
+                  <input id="c-annee" class="champ" type="number" min="1900" max="2100" placeholder="2021">
+                </div>
+                <div>
+                  <label class="etiquette" for="c-ref">Référence</label>
+                  <input id="c-ref" class="champ" placeholder="Ex. 116508">
+                </div>
+                <div>
+                  <label class="etiquette" for="c-materiaux">Matériaux</label>
+                  <input id="c-materiaux" class="champ" list="l-materiaux" placeholder="Ex. Acier Oystersteel">
+                  <datalist id="l-materiaux">
+                    <option value="Acier"></option>
+                    <option value="Acier Oystersteel"></option>
+                    <option value="Or jaune 18 ct"></option>
+                    <option value="Or rose 18 ct"></option>
+                    <option value="Or blanc 18 ct"></option>
+                    <option value="Acier & or jaune (Rolesor)"></option>
+                    <option value="Titane"></option>
+                    <option value="Platine"></option>
+                    <option value="Céramique"></option>
+                  </datalist>
+                </div>
+                <div>
+                  <label class="etiquette" for="c-matiere">Matière (filtre site) <span class="badge-auto" id="badge-matiere">auto</span></label>
+                  <select id="c-matiere" class="champ">
+                    <option>Acier</option><option>Or</option><option>Acier & or</option>
+                    <option>Titane</option><option>Platine</option><option>Céramique</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="etiquette" for="c-couleur">Couleur du cadran</label>
+                  <input id="c-couleur" class="champ" list="l-couleurs" placeholder="Ex. Noir">
+                  <datalist id="l-couleurs"></datalist>
+                </div>
+                <div>
+                  <label class="etiquette" for="c-diametre">Diamètre (mm)</label>
+                  <input id="c-diametre" class="champ" placeholder="Ex. 40 ou 43,5">
+                </div>
+                <div>
+                  <label class="etiquette" for="c-mouvement">Mouvement</label>
+                  <input id="c-mouvement" class="champ" list="l-mouvements" placeholder="Ex. Calibre 3235, automatique">
+                  <datalist id="l-mouvements">
+                    <option value="Automatique"></option>
+                    <option value="Automatique de manufacture"></option>
+                    <option value="Chronographe automatique"></option>
+                    <option value="Remontage manuel"></option>
+                    <option value="Quartz"></option>
+                  </datalist>
+                </div>
+                <div>
+                  <label class="etiquette" for="c-etat">État</label>
+                  <input id="c-etat" class="champ" list="l-etats" placeholder="Ex. Comme neuf">
+                  <datalist id="l-etats">
+                    <option value="Neuf, jamais porté"></option>
+                    <option value="Comme neuf"></option>
+                    <option value="Excellent, non poli"></option>
+                    <option value="Excellent"></option>
+                    <option value="Très bon état"></option>
+                    <option value="Très bel état d’origine"></option>
+                    <option value="Bon état, révisée"></option>
+                  </datalist>
+                </div>
+              </div>
+            </fieldset>
+
+            <!-- Photos -->
+            <fieldset>
+              <legend class="text-[11px] tracking-luxe uppercase mb-8 border-b border-platine/40 pb-3 w-full">03 — Photos</legend>
+
+              <div id="zone-photos" class="zone-depot p-10 text-center">
+                <p class="text-[13px]">Déposez vos photos ici, ou <span class="underline underline-offset-4">cliquez pour parcourir</span></p>
+                <p class="mt-2 text-[11px] text-gris">La première photo devient la photo principale. Elles passeront automatiquement en noir &amp; blanc sur le site.</p>
+                <input id="fichiers-photos" type="file" accept="image/*" multiple class="hidden">
+              </div>
+              <div class="mt-4 flex gap-3">
+                <input id="c-photo-url" class="champ" placeholder="…ou collez l’URL d’une image et validez avec Entrée">
+              </div>
+              <div id="grille-photos" class="mt-6 grid grid-cols-3 sm:grid-cols-5 gap-3"></div>
+
+              <div class="mt-10">
+                <label class="etiquette" for="c-ambiance">Photo d’ambiance (bande large de la fiche)</label>
+                <input id="c-ambiance" class="champ" placeholder="URL — laissez vide pour réutiliser la photo principale">
+              </div>
+            </fieldset>
+
+            <!-- Description -->
+            <fieldset>
+              <legend class="text-[11px] tracking-luxe uppercase mb-8 border-b border-platine/40 pb-3 w-full">04 — Description</legend>
+              <div class="flex items-center justify-between mb-3">
+                <p class="text-[11px] text-gris">Deux paragraphes conseillés — séparez-les par une ligne vide.</p>
+                <button type="button" id="btn-rediger" class="btn btn-contour !py-2 !px-4">✦ Rédiger un brouillon</button>
+              </div>
+              <textarea id="c-description" class="champ" rows="7" placeholder="L’histoire du modèle, puis l’état et le set de votre exemplaire…"></textarea>
+            </fieldset>
+
+            <!-- Set & provenance -->
+            <fieldset>
+              <legend class="text-[11px] tracking-luxe uppercase mb-8 border-b border-platine/40 pb-3 w-full">05 — Set &amp; provenance</legend>
+              <p class="text-[11px] text-gris mb-4">Cliquez pour ajouter les éléments livrés avec la montre :</p>
+              <div id="puces-set" class="flex flex-wrap gap-2.5"></div>
+              <div class="mt-6 grid sm:grid-cols-2 gap-x-10 gap-y-6">
+                <div>
+                  <label class="etiquette" for="c-set-libre">Autre élément</label>
+                  <input id="c-set-libre" class="champ" placeholder="Saisissez puis validez avec Entrée">
+                </div>
+                <div>
+                  <label class="etiquette" for="c-provenance">Provenance</label>
+                  <select id="c-provenance" class="champ">
+                    <option value="">— Choisir —</option>
+                    <option>Provenance française</option>
+                    <option>Provenance suisse</option>
+                    <option>Provenance européenne documentée</option>
+                    <option>Provenance internationale documentée</option>
+                    <option>Première main</option>
+                    <option>Première main, achetée en boutique</option>
+                  </select>
+                </div>
+              </div>
+              <ul id="liste-set" class="mt-8 space-y-3 text-[14px] text-gris"></ul>
+            </fieldset>
+
+            <!-- Publication -->
+            <fieldset>
+              <legend class="text-[11px] tracking-luxe uppercase mb-8 border-b border-platine/40 pb-3 w-full">06 — Publication</legend>
+              <label class="flex items-center gap-4 cursor-pointer select-none">
+                <input id="c-vitrine" type="checkbox" class="sr-only">
+                <span class="interrupteur"></span>
+                <span class="text-[13px]">Mettre en vitrine sur la page d’accueil <span id="compte-vitrine" class="text-gris"></span></span>
+              </label>
+              <p id="alerte-vitrine" class="hidden mt-3 text-[12px] text-gris">La vitrine affiche 6 pièces : la plus ancienne sélection sera remplacée.</p>
+            </fieldset>
+
+            <p id="erreurs-form" class="hidden text-[13px] border border-noir bg-white px-5 py-4"></p>
+
+            <div class="flex flex-wrap items-center gap-5 pt-2 pb-20">
+              <button type="submit" id="btn-enregistrer" class="btn btn-noir">Publier la pièce</button>
+              <button type="button" id="btn-annuler" class="btn btn-contour">Annuler</button>
+              <button type="button" id="btn-supprimer" class="hidden ml-auto text-[11px] tracking-luxe uppercase text-gris hover:text-noir border-b border-transparent hover:border-noir pb-px transition-colors">Supprimer cette pièce</button>
+            </div>
+          </form>
+
+          <!-- ---------- Aperçu live ---------- -->
+          <aside class="hidden xl:block sticky top-14">
+            <p class="text-[11px] tracking-luxe uppercase text-gris mb-6">Aperçu sur le site</p>
+            <div id="apercu-carte" class="carte-produit block max-w-[340px]"></div>
+            <div class="mt-10">
+              <p class="text-[11px] tracking-luxe uppercase text-gris mb-2">Caractéristiques</p>
+              <dl id="apercu-specs" class="divide-y divide-platine/40 border-b border-platine/40 text-[13px]"></dl>
+            </div>
+          </aside>
+
+        </div>
+      </section>
+
+      <!-- Toast -->
+      <div id="toast" class="hidden toast fixed bottom-8 right-8 z-50 bg-noir text-ivoire px-7 py-5 text-[12px] tracking-wide max-w-sm"></div>
+    </main>
+  </div>
+
+  <script>
+  // ============================================================
+  // EDO WATCHES — dashboard
+  // ============================================================
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const urlLogo = (d) => 'https://www.google.com/s2/favicons?domain=' + d + '&sz=128';
+
+  let DONNEES = { marques: [], montres: {} };
+  let slugEdite = null;        // slug de la pièce en cours d'édition (null = création)
+  let photos = [];             // URLs, la première = principale
+  let setItems = [];           // lignes « set & provenance »
+  let sousTitreManuel = false; // l'utilisateur a touché le sous-titre
+  let matiereManuelle = false; // idem pour la matière (filtre)
+
+  const SUGGESTIONS_SET = (annee) => [
+    'Boîte et écrin d’origine',
+    'Carte de garantie' + (annee ? ' datée de ' + annee : ''),
+    'Garantie internationale en cours',
+    'Documentation complète',
+    'Maillons et documentation complets',
+    'Papiers de la manufacture',
+    'Facture d’origine',
+    'Révision récente attestée',
+  ];
+
+  // ---------- Chargement ----------
+  async function charger() {
+    try {
+      const r = await fetch('/api/data');
+      if (!r.ok) throw 0;
+      DONNEES = await r.json();
+    } catch {
+      $('alerte-serveur').classList.remove('hidden');
+      // Repli lecture seule : montres.js si la page est ouverte sans serveur
+      if (typeof MONTRES !== 'undefined') DONNEES = { marques: MARQUES, montres: MONTRES };
+    }
+    rendreListe();
+    remplirMarques();
+    remplirCouleurs();
+  }
+
+  function fmtPrix(n) {
+    return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
+  }
+
+  // ============================================================
+  // VUE LISTE
+  // ============================================================
+  function rendreListe() {
+    const entrees = Object.entries(DONNEES.montres);
+    const filtre = $('recherche').value.trim().toLowerCase();
+
+    // Statistiques
+    const total = entrees.reduce((s, [, m]) => s + (m.prixNum || 0), 0);
+    const enVitrine = entrees.filter(([, m]) => m.enVitrine).length;
+    const nbMarques = new Set(entrees.map(([, m]) => m.marque)).size;
+    $('stats').innerHTML = [
+      ['Pièces en stock', entrees.length],
+      ['Valeur du stock', fmtPrix(total)],
+      ['Prix moyen', entrees.length ? fmtPrix(total / entrees.length) : '—'],
+      ['Vitrine accueil', enVitrine + ' / 6'],
+    ].map(([k, v]) => `
+      <div class="border-r border-b border-platine/40 px-6 py-7 bg-ivoire">
+        <p class="text-[10px] tracking-luxe uppercase text-gris">${k}</p>
+        <p class="mt-3 font-serif text-3xl font-light">${v}</p>
+      </div>`).join('');
+    $('pied-compte').textContent = entrees.length + ' pièces · ' + nbMarques + ' marques';
+
+    // Lignes
+    const visibles = entrees.filter(([slug, m]) => {
+      if (!filtre) return true;
+      return (m.marque + ' ' + m.nom + ' ' + (m.specs?.['Référence'] || '') + ' ' + slug).toLowerCase().includes(filtre);
+    });
+
+    $('liste-pieces').innerHTML = visibles.map(([slug, m]) => `
+      <div class="ligne-piece grid grid-cols-[auto_64px_1fr_auto] items-center gap-5 border-b border-platine/40 py-4 pr-2"
+           draggable="${filtre ? 'false' : 'true'}" data-slug="${esc(slug)}">
+        <span class="poignee text-platine px-1 text-lg leading-none select-none" title="Glisser pour réordonner">⠿</span>
+        <div class="nb w-16 h-20 bg-white border border-platine/30 overflow-hidden">
+          <img src="${esc(m.image)}" alt="" class="w-full h-full object-cover">
+        </div>
+        <div class="min-w-0">
+          <p class="font-serif text-lg leading-tight truncate">${esc(m.marque)} ${esc(m.nom)}</p>
+          <p class="mt-0.5 text-[12px] text-gris truncate">${esc(m.sousTitre)}</p>
+          <p class="mt-1 text-[13px]">${esc(m.prix)}
+            ${m.enVitrine ? '<span class="ml-3 text-[9px] tracking-luxe uppercase border border-noir px-2 py-0.5">Vitrine</span>' : ''}
+          </p>
+        </div>
+        <div class="flex items-center gap-4 text-[10px] tracking-luxe uppercase">
+          <a href="montre.html?m=${esc(slug)}" target="_blank" class="text-gris hover:text-noir transition-colors hidden sm:inline">Fiche</a>
+          <button class="act-vitrine text-gris hover:text-noir transition-colors hidden sm:inline">${m.enVitrine ? 'Retirer vitrine' : 'Vitrine'}</button>
+          <button class="act-modifier border-b border-noir pb-px hover:text-gris hover:border-gris transition-colors">Modifier</button>
+          <button class="act-supprimer text-gris hover:text-noir transition-colors" title="Supprimer">✕</button>
+        </div>
+      </div>`).join('')
+      || '<p class="py-14 text-gris text-[14px]">Aucune pièce ne correspond.</p>';
+
+    brancherLignes();
+  }
+
+  function brancherLignes() {
+    document.querySelectorAll('.ligne-piece').forEach(ligne => {
+      const slug = ligne.dataset.slug;
+      if (!slug) return;
+      ligne.querySelector('.act-modifier')?.addEventListener('click', () => ouvrirFormulaire(slug));
+      ligne.querySelector('.act-vitrine')?.addEventListener('click', () => basculerVitrine(slug));
+      ligne.querySelector('.act-supprimer')?.addEventListener('click', () => supprimerPiece(slug, ligne));
+
+      // Drag & drop — réordonnancement
+      ligne.addEventListener('dragstart', () => ligne.classList.add('fantome'));
+      ligne.addEventListener('dragend', async () => {
+        ligne.classList.remove('fantome');
+        await envoyerOrdre();
+      });
+      ligne.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const glissee = document.querySelector('.fantome');
+        if (!glissee || glissee === ligne) return;
+        const r = ligne.getBoundingClientRect();
+        const apres = e.clientY > r.top + r.height / 2;
+        ligne.parentNode.insertBefore(glissee, apres ? ligne.nextSibling : ligne);
+      });
+    });
+  }
+
+  async function envoyerOrdre() {
+    const slugs = [...document.querySelectorAll('.ligne-piece')].map(l => l.dataset.slug).filter(Boolean);
+    if (slugs.length !== Object.keys(DONNEES.montres).length) return;
+    const nouveau = {};
+    slugs.forEach(s => nouveau[s] = DONNEES.montres[s]);
+    DONNEES.montres = nouveau;
+    rendreListe();
+    await appelApi('/api/ordre', 'POST', { slugs });
+  }
+
+  async function basculerVitrine(slug) {
+    const m = DONNEES.montres[slug];
+    m.enVitrine = !m.enVitrine;
+    // Vitrine limitée à 6 : on retire la plus ancienne sélection si besoin
+    const vitrine = Object.entries(DONNEES.montres).filter(([, x]) => x.enVitrine);
+    if (vitrine.length > 6) {
+      const [ancien] = vitrine.find(([s]) => s !== slug);
+      DONNEES.montres[ancien].enVitrine = false;
+      await appelApi('/api/montre', 'POST', { slug: ancien, montre: DONNEES.montres[ancien] });
+    }
+    await appelApi('/api/montre', 'POST', { slug, montre: m });
+    rendreListe();
+    toast(m.enVitrine ? 'Pièce mise en vitrine sur l’accueil.' : 'Pièce retirée de la vitrine.');
+  }
+
+  async function supprimerPiece(slug, ligne) {
+    const m = DONNEES.montres[slug];
+    if (!confirm('Supprimer définitivement « ' + m.marque + ' ' + m.nom + ' » du catalogue ?')) return;
+    const r = await appelApi('/api/montre?slug=' + encodeURIComponent(slug), 'DELETE');
+    if (!r) return;
+    delete DONNEES.montres[slug];
+    ligne.remove();
+    rendreListe();
+    toast('Pièce supprimée du catalogue.');
+  }
+
+  // ============================================================
+  // VUE FORMULAIRE
+  // ============================================================
+  function remplirMarques() {
+    const sel = $('c-marque');
+    sel.innerHTML = '<option value="">— Choisir une maison —</option>' +
+      DONNEES.marques.map(m => `<option value="${esc(m.nom)}">${esc(m.nom)}</option>`).join('') +
+      '<option value="__nouvelle__">+ Nouvelle marque…</option>';
+  }
+
+  function remplirCouleurs() {
+    const couleurs = new Set(['Noir', 'Blanc', 'Argenté', 'Gris', 'Bleu', 'Vert', 'Champagne']);
+    Object.values(DONNEES.montres).forEach(m => m.couleur && couleurs.add(m.couleur));
+    $('l-couleurs').innerHTML = [...couleurs].map(c => `<option value="${esc(c)}"></option>`).join('');
+  }
+
+  function ouvrirFormulaire(slug = null) {
+    slugEdite = slug;
+    const m = slug ? DONNEES.montres[slug] : null;
+
+    $('titre-form').innerHTML = m ? 'Modifier la <em class="italic">pièce</em>' : 'Ajouter une <em class="italic">pièce</em>';
+    $('fil-form').textContent = m ? (m.marque + ' ' + m.nom) : 'Nouvelle pièce';
+    $('btn-enregistrer').textContent = m ? 'Enregistrer les modifications' : 'Publier la pièce';
+    $('btn-supprimer').classList.toggle('hidden', !m);
+    $('erreurs-form').classList.add('hidden');
+
+    // Champs
+    $('c-marque').value = m?.marque || '';
+    $('bloc-nouvelle-marque').classList.add('hidden');
+    $('c-nom').value = m?.nom || '';
+    $('c-prix').value = m?.prixNum || '';
+    $('c-annee').value = m?.annee || '';
+    $('c-ref').value = m?.specs?.['Référence'] || '';
+    $('c-materiaux').value = m?.specs?.['Matière'] || '';
+    $('c-matiere').value = m?.matiere || 'Acier';
+    $('c-couleur').value = m?.couleur || '';
+    $('c-diametre').value = (m?.specs?.['Diamètre'] || '').replace(/\s*mm$/, '');
+    $('c-mouvement').value = m?.specs?.['Mouvement'] || '';
+    $('c-etat').value = m?.specs?.['État'] || '';
+    $('c-ambiance').value = (m?.ambiance && m.ambiance !== m.image) ? m.ambiance : '';
+    $('c-description').value = (m?.description || []).join('\n\n');
+    $('c-vitrine').checked = !!m?.enVitrine;
+
+    photos = m ? [m.image, ...(m.galerie || [])].filter(Boolean) : [];
+    setItems = m ? [...(m.set || [])] : [];
+    $('c-provenance').value = '';
+    $('c-set-libre').value = '';
+    $('c-photo-url').value = '';
+
+    // Sous-titre : vide si identique à la version auto (on reste en mode auto)
+    matiereManuelle = !!m;
+    sousTitreManuel = false;
+    $('c-sous-titre').value = (m && m.sousTitre !== composerSousTitre()) ? m.sousTitre : '';
+    sousTitreManuel = !!$('c-sous-titre').value;
+    majBadges();
+
+    rendrePhotos();
+    rendreSet();
+    rendrePuces();
+    majApercu();
+    basculerVue('form');
+  }
+
+  // ---------- Compositions intelligentes ----------
+  function composerSousTitre() {
+    const morceaux = [
+      $('c-annee').value,
+      $('c-materiaux').value.trim(),
+      $('c-ref').value.trim() ? 'Réf. ' + $('c-ref').value.trim() : '',
+    ].filter(Boolean);
+    return morceaux.join(' · ');
+  }
+
+  function sousTitreFinal() {
+    return sousTitreManuel && $('c-sous-titre').value.trim()
+      ? $('c-sous-titre').value.trim()
+      : composerSousTitre();
+  }
+
+  function devinerMatiere(texte) {
+    const t = texte.toLowerCase();
+    const or = /\bor\b|rolesor|jaune 18|rose 18|blanc 18/.test(t);
+    const acier = /acier|oyster|steel|inox/.test(t);
+    if (or && acier) return 'Acier & or';
+    if (or) return 'Or';
+    if (/titane/.test(t)) return 'Titane';
+    if (/platine/.test(t)) return 'Platine';
+    if (/céramique|ceramique/.test(t)) return 'Céramique';
+    return 'Acier';
+  }
+
+  function composerAlt() {
+    const morceaux = [$('c-marque').value + ' ' + $('c-nom').value.trim()];
+    if ($('c-couleur').value.trim()) morceaux.push('cadran ' + $('c-couleur').value.trim().toLowerCase());
+    if ($('c-materiaux').value.trim()) morceaux.push($('c-materiaux').value.trim().toLowerCase());
+    return morceaux.join(', ');
+  }
+
+  function composerSpecs() {
+    const diametre = $('c-diametre').value.trim();
+    const paires = [
+      ['Référence', $('c-ref').value.trim() || $('c-nom').value.trim()],
+      ['Année', $('c-annee').value],
+      ['Matière', $('c-materiaux').value.trim()],
+      ['Diamètre', diametre ? diametre.replace(/\s*mm$/, '') + ' mm' : ''],
+      ['Mouvement', $('c-mouvement').value.trim()],
+      ['État', $('c-etat').value.trim()],
+    ].filter(([, v]) => v);
+    return Object.fromEntries(paires);
+  }
+
+  function redigerBrouillon() {
+    const nom = $('c-nom').value.trim() || 'Cette pièce';
+    const marque = $('c-marque').value || 'la maison';
+    const annee = $('c-annee').value;
+    const materiaux = $('c-materiaux').value.trim();
+    const mouvement = $('c-mouvement').value.trim();
+    const etat = $('c-etat').value.trim();
+    const diametre = $('c-diametre').value.trim();
+
+    const p1 = `${nom.startsWith('La ') || nom.startsWith('Le ') ? nom : 'La ' + nom} compte parmi les créations les plus recherchées de ${marque}.`
+      + (materiaux ? ` Cette exécution en ${materiaux.toLowerCase()}` + (diametre ? `, boîtier de ${diametre.replace(/\s*mm$/, '')} mm,` : '') + ' en est une expression particulièrement élégante.' : '')
+      + ' Une pièce qui traverse les modes sans jamais leur appartenir.';
+
+    const p2 = `Notre exemplaire${annee ? ', produit en ' + annee + ',' : ''} ${etat ? 'présente un état « ' + etat.toLowerCase() + ' »' : 'a été contrôlé par nos horlogers'}.`
+      + (mouvement ? ` Son mouvement — ${mouvement.toLowerCase()} — a été vérifié par nos soins.` : '')
+      + ' Il est livré avec l’intégralité de son set, authenticité garantie par la maison.';
+
+    $('c-description').value = p1 + '\n\n' + p2;
+    majApercu();
+    toast('Brouillon rédigé — relisez et ajustez à votre goût.');
+  }
+
+  // ---------- Photos ----------
+  function rendrePhotos() {
+    $('grille-photos').innerHTML = photos.map((url, i) => `
+      <figure class="relative group nb border ${i === 0 ? 'border-noir' : 'border-platine/40'}">
+        <img src="${esc(url)}" alt="" class="w-full aspect-[4/5] object-cover">
+        ${i === 0
+          ? '<figcaption class="absolute bottom-0 inset-x-0 bg-noir text-ivoire text-[9px] tracking-luxe uppercase text-center py-1.5">Principale</figcaption>'
+          : `<button type="button" data-principale="${i}" class="absolute bottom-0 inset-x-0 bg-white/90 text-[9px] tracking-luxe uppercase py-1.5 opacity-0 group-hover:opacity-100 transition-opacity">Rendre principale</button>`}
+        <button type="button" data-retirer="${i}" class="absolute top-1.5 right-1.5 w-6 h-6 bg-noir text-ivoire text-[11px] leading-none opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
+      </figure>`).join('');
+
+    $('grille-photos').querySelectorAll('[data-retirer]').forEach(b =>
+      b.addEventListener('click', () => { photos.splice(+b.dataset.retirer, 1); rendrePhotos(); majApercu(); }));
+    $('grille-photos').querySelectorAll('[data-principale]').forEach(b =>
+      b.addEventListener('click', () => {
+        const [p] = photos.splice(+b.dataset.principale, 1);
+        photos.unshift(p);
+        rendrePhotos(); majApercu();
+      }));
+  }
+
+  // Recompression intelligente côté navigateur : max 2000 px, JPEG q0.85
+  // (limite Vercel : 4,5 Mo par requête ; et le site n'a pas besoin de plus)
+  function compresserImage(fichier) {
+    return new Promise((resoudre) => {
+      if (fichier.size < 800 * 1024 && fichier.type !== 'image/heic') return resoudre({ blob: fichier, nom: fichier.name });
+      const img = new Image();
+      const url = URL.createObjectURL(fichier);
+      img.onload = () => {
+        const ratio = Math.min(1, 2000 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * ratio);
+        c.height = Math.round(img.height * ratio);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(
+          (b) => resoudre(b ? { blob: b, nom: fichier.name.replace(/\.[^.]+$/, '') + '.jpg' } : { blob: fichier, nom: fichier.name }),
+          'image/jpeg', 0.85
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resoudre({ blob: fichier, nom: fichier.name }); };
+      img.src = url;
+    });
+  }
+
+  async function televerserFichiers(fichiers, deuxieme) {
+    for (const f of fichiers) {
+      if (!f.type.startsWith('image/')) continue;
+      toast('Téléversement de « ' + f.name + ' »…');
+      try {
+        const { blob, nom } = await compresserImage(f);
+        const entetes = { 'Content-Type': 'application/octet-stream' };
+        const cle = localStorage.getItem('edoCle');
+        if (cle) entetes['x-edo-cle'] = cle;
+        const r = await fetch('/api/upload?nom=' + encodeURIComponent(nom), { method: 'POST', headers: entetes, body: blob });
+        const j = await r.json();
+        if (r.status === 401 && !deuxieme) {
+          if (cleAdmin(true)) return televerserFichiers(fichiers, true);
+        }
+        if (!r.ok) throw new Error(j.erreur || 'Échec du téléversement');
+        photos.push(j.url);
+      } catch (e) {
+        toast('⚠ ' + e.message);
+      }
+    }
+    rendrePhotos();
+    majApercu();
+  }
+
+  // ---------- Set & provenance ----------
+  function rendrePuces() {
+    $('puces-set').innerHTML = SUGGESTIONS_SET($('c-annee').value).map(s =>
+      `<button type="button" class="puce" data-prise="${setItems.includes(s) ? 1 : 0}">${esc(s)}</button>`).join('');
+    $('puces-set').querySelectorAll('.puce').forEach(p =>
+      p.addEventListener('click', () => { ajouterSet(p.textContent); }));
+  }
+
+  function ajouterSet(texte) {
+    texte = texte.trim();
+    if (!texte || setItems.includes(texte)) return;
+    setItems.push(texte);
+    rendreSet(); rendrePuces();
+  }
+
+  function rendreSet() {
+    $('liste-set').innerHTML = setItems.map((s, i) => `
+      <li class="flex items-center gap-4">
+        <span class="block w-8 h-px bg-noir/40 flex-none"></span>
+        <span class="flex-1">${esc(s)}</span>
+        <button type="button" data-i="${i}" class="text-gris hover:text-noir transition-colors text-[12px]">✕</button>
+      </li>`).join('') || '<li class="text-[12px] text-gris/70 italic">Rien pour l’instant — utilisez les suggestions ci-dessus.</li>';
+    $('liste-set').querySelectorAll('[data-i]').forEach(b =>
+      b.addEventListener('click', () => { setItems.splice(+b.dataset.i, 1); rendreSet(); rendrePuces(); }));
+  }
+
+  // ---------- Aperçu live ----------
+  function majApercu() {
+    const prix = +$('c-prix').value || 0;
+    $('apercu-prix').textContent = prix ? fmtPrix(prix) : '—';
+
+    const image = photos[0] || '';
+    $('apercu-carte').innerHTML = `
+      <div class="img-zoom nb aspect-[4/5] bg-white border border-platine/30">
+        ${image ? `<img src="${esc(image)}" alt="" class="w-full h-full object-cover">`
+                : '<div class="w-full h-full grid place-items-center text-[11px] tracking-luxe uppercase text-platine">Photo à venir</div>'}
+      </div>
+      <div class="mt-6">
+        <h3 class="font-serif text-xl font-normal">${esc(($('c-marque').value || 'Marque') + ' ' + ($('c-nom').value || 'Modèle'))}</h3>
+        <p class="mt-1 text-[13px] text-gris">${esc(sousTitreFinal() || 'Sous-titre')}</p>
+        <div class="mt-3 flex items-baseline justify-between">
+          <p class="text-[15px] font-light tracking-wide">${prix ? fmtPrix(prix) : '— €'}</p>
+          <span class="decouvrir text-[11px] tracking-luxe uppercase">Découvrir →</span>
+        </div>
+      </div>`;
+
+    $('apercu-specs').innerHTML = Object.entries(composerSpecs()).map(([k, v]) =>
+      `<div class="flex justify-between gap-6 py-3"><dt class="text-gris uppercase tracking-wide text-[11px]">${esc(k)}</dt><dd class="text-right">${esc(v)}</dd></div>`).join('')
+      || '<p class="py-3 text-[12px] text-gris/70 italic">Complétez les caractéristiques…</p>';
+
+    if (!sousTitreManuel) $('c-sous-titre').placeholder = composerSousTitre() || 'Généré automatiquement : année · matériaux · réf.';
+    if (!matiereManuelle) $('c-matiere').value = devinerMatiere($('c-materiaux').value);
+    majBadges();
+
+    // Compteur vitrine
+    const nbVitrine = Object.entries(DONNEES.montres)
+      .filter(([s, m]) => m.enVitrine && s !== slugEdite).length + ($('c-vitrine').checked ? 1 : 0);
+    $('compte-vitrine').textContent = '(' + Math.min(nbVitrine, 6) + '/6)';
+    $('alerte-vitrine').classList.toggle('hidden', !($('c-vitrine').checked && nbVitrine > 6));
+  }
+
+  function majBadges() {
+    $('badge-sous-titre').style.display = sousTitreManuel ? 'none' : '';
+    $('badge-matiere').style.display = matiereManuelle ? 'none' : '';
+  }
+
+  // ---------- Enregistrement ----------
+  async function enregistrer(e) {
+    e.preventDefault();
+    const erreurs = [];
+    if (!$('c-marque').value || $('c-marque').value === '__nouvelle__') erreurs.push('choisissez une marque');
+    if (!$('c-nom').value.trim()) erreurs.push('indiquez le modèle');
+    if (!(+$('c-prix').value > 0)) erreurs.push('indiquez un prix');
+    if (!photos.length) erreurs.push('ajoutez au moins une photo');
+    if (erreurs.length) {
+      $('erreurs-form').textContent = 'Avant de publier : ' + erreurs.join(' · ') + '.';
+      $('erreurs-form').classList.remove('hidden');
+      $('erreurs-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Description : saisie, sinon brouillon auto silencieux
+    let description = $('c-description').value.split(/\n\s*\n/).map(p => p.trim().replace(/\s*\n\s*/g, ' ')).filter(Boolean);
+    if (!description.length) { redigerBrouillon(); description = $('c-description').value.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean); }
+
+    if ($('c-provenance').value) ajouterSet($('c-provenance').value);
+
+    const prixNum = Math.round(+$('c-prix').value);
+    const montre = {
+      marque: $('c-marque').value,
+      nom: $('c-nom').value.trim(),
+      sousTitre: sousTitreFinal(),
+      prix: fmtPrix(prixNum),
+      prixNum,
+      annee: +$('c-annee').value || null,
+      couleur: $('c-couleur').value.trim() || 'Noir',
+      matiere: $('c-matiere').value,
+      image: photos[0],
+      alt: composerAlt(),
+      ambiance: $('c-ambiance').value.trim(),
+      galerie: photos.slice(1),
+      enVitrine: $('c-vitrine').checked,
+      description,
+      specs: composerSpecs(),
+      set: setItems,
+    };
+
+    $('btn-enregistrer').disabled = true;
+    const r = await appelApi('/api/montre', 'POST', { slug: slugEdite, montre });
+    $('btn-enregistrer').disabled = false;
+    if (!r) return;
+
+    // Vitrine limitée à 6
+    if (montre.enVitrine) {
+      const vitrine = Object.entries(DONNEES.montres).filter(([s, m]) => m.enVitrine && s !== r.slug);
+      if (vitrine.length >= 6) {
+        const [ancien] = vitrine[0];
+        DONNEES.montres[ancien].enVitrine = false;
+        await appelApi('/api/montre', 'POST', { slug: ancien, montre: DONNEES.montres[ancien] });
+      }
+    }
+
+    if (!montre.ambiance) montre.ambiance = montre.image;
+    DONNEES.montres[r.slug] = montre;
+    if (!slugEdite) {
+      // Nouvelle pièce : remonter l'objet pour refléter l'ordre serveur (ajout en fin)
+      const copie = { ...DONNEES.montres };
+      DONNEES.montres = copie;
+    }
+    remplirCouleurs();
+    rendreListe();
+    basculerVue('liste');
+    toast((slugEdite ? 'Pièce mise à jour' : 'Pièce publiée') + ' — <a class="underline underline-offset-4" target="_blank" href="montre.html?m=' + esc(r.slug) + '">voir la fiche →</a>', true);
+    slugEdite = null;
+  }
+
+  // ---------- Utilitaires ----------
+  // Clé d'accès (prod Vercel) : demandée à la première écriture, retenue ensuite
+  function cleAdmin(forcer) {
+    let cle = localStorage.getItem('edoCle') || '';
+    if (!cle || forcer) {
+      cle = prompt('Clé d’accès du dashboard :', cle) || '';
+      if (cle) localStorage.setItem('edoCle', cle);
+    }
+    return cle;
+  }
+
+  async function appelApi(url, methode, corps, deuxieme) {
+    try {
+      const entetes = corps ? { 'Content-Type': 'application/json' } : {};
+      const cle = localStorage.getItem('edoCle');
+      if (cle) entetes['x-edo-cle'] = cle;
+      const r = await fetch(url, {
+        method: methode,
+        headers: entetes,
+        body: corps ? JSON.stringify(corps) : undefined,
+      });
+      const j = await r.json();
+      if (r.status === 401 && !deuxieme) {
+        if (cleAdmin(true)) return appelApi(url, methode, corps, true);
+      }
+      if (!r.ok) throw new Error(j.erreur || 'Erreur serveur');
+      return j;
+    } catch (e) {
+      toast('⚠ ' + (e.message === 'Failed to fetch' ? 'Serveur introuvable — lancez python server.py' : e.message));
+      return null;
+    }
+  }
+
+  let minuteurToast;
+  function toast(html, longue) {
+    const t = $('toast');
+    t.innerHTML = html;
+    t.classList.remove('hidden');
+    clearTimeout(minuteurToast);
+    minuteurToast = setTimeout(() => t.classList.add('hidden'), longue ? 8000 : 3500);
+  }
+
+  function basculerVue(vue) {
+    $('vue-liste').classList.toggle('hidden', vue !== 'liste');
+    $('vue-form').classList.toggle('hidden', vue !== 'form');
+    document.querySelectorAll('.lien-vue').forEach(b =>
+      b.classList.toggle('text-white/50', b.dataset.nav !== vue));
+    window.scrollTo({ top: 0 });
+  }
+
+  // ============================================================
+  // Branchements
+  // ============================================================
+  $('btn-ajouter').addEventListener('click', () => ouvrirFormulaire());
+  $('retour-liste').addEventListener('click', () => basculerVue('liste'));
+  $('btn-annuler').addEventListener('click', () => basculerVue('liste'));
+  document.querySelectorAll('.lien-vue').forEach(b =>
+    b.addEventListener('click', () => b.dataset.nav === 'form' ? ouvrirFormulaire() : basculerVue('liste')));
+  $('recherche').addEventListener('input', rendreListe);
+  $('formulaire').addEventListener('submit', enregistrer);
+  $('btn-rediger').addEventListener('click', redigerBrouillon);
+  $('btn-supprimer').addEventListener('click', async () => {
+    if (!slugEdite) return;
+    const ligne = document.querySelector(`.ligne-piece[data-slug="${slugEdite}"]`);
+    await supprimerPiece(slugEdite, ligne || document.createElement('div'));
+    basculerVue('liste');
+  });
+
+  // Marque : bloc « nouvelle marque »
+  $('c-marque').addEventListener('change', () => {
+    $('bloc-nouvelle-marque').classList.toggle('hidden', $('c-marque').value !== '__nouvelle__');
+    majApercu();
+  });
+  $('c-marque-domaine').addEventListener('input', () => {
+    const d = $('c-marque-domaine').value.trim().replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+    const img = $('apercu-logo-marque');
+    img.classList.toggle('hidden', !d);
+    if (d) img.src = urlLogo(d);
+  });
+  $('btn-creer-marque').addEventListener('click', async () => {
+    const nom = $('c-marque-nom').value.trim();
+    if (!nom) return toast('⚠ Indiquez le nom de la maison.');
+    const r = await appelApi('/api/marque', 'POST', { nom, domaine: $('c-marque-domaine').value.trim() });
+    if (!r) return;
+    if (!DONNEES.marques.some(m => m.nom.toLowerCase() === nom.toLowerCase()))
+      DONNEES.marques.push({ nom, domaine: $('c-marque-domaine').value.trim() || 'watch.com' });
+    remplirMarques();
+    $('c-marque').value = nom;
+    $('bloc-nouvelle-marque').classList.add('hidden');
+    $('c-marque-nom').value = ''; $('c-marque-domaine').value = '';
+    majApercu();
+    toast('Maison « ' + nom + ' » ajoutée — elle apparaît aussi dans le menu du site.');
+  });
+
+  // Photos : dropzone + fichiers + URL
+  $('zone-photos').addEventListener('click', () => $('fichiers-photos').click());
+  $('fichiers-photos').addEventListener('change', (e) => televerserFichiers([...e.target.files]));
+  ['dragover', 'dragleave', 'drop'].forEach(ev =>
+    $('zone-photos').addEventListener(ev, (e) => {
+      e.preventDefault();
+      $('zone-photos').classList.toggle('survol', ev === 'dragover');
+      if (ev === 'drop') televerserFichiers([...e.dataTransfer.files]);
+    }));
+  $('c-photo-url').addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const url = $('c-photo-url').value.trim();
+    if (!url) return;
+    photos.push(url);
+    $('c-photo-url').value = '';
+    rendrePhotos(); majApercu();
+  });
+
+  // Set libre + provenance
+  $('c-set-libre').addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    ajouterSet($('c-set-libre').value);
+    $('c-set-libre').value = '';
+  });
+  $('c-provenance').addEventListener('change', () => {
+    if ($('c-provenance').value) { ajouterSet($('c-provenance').value); $('c-provenance').value = ''; }
+  });
+
+  // Modes auto (sous-titre / matière)
+  $('c-sous-titre').addEventListener('input', () => { sousTitreManuel = !!$('c-sous-titre').value.trim(); majApercu(); });
+  $('c-matiere').addEventListener('change', () => { matiereManuelle = true; majBadges(); majApercu(); });
+
+  // Aperçu live sur tous les champs
+  ['c-nom', 'c-prix', 'c-annee', 'c-ref', 'c-materiaux', 'c-couleur', 'c-diametre', 'c-mouvement', 'c-etat', 'c-description'].forEach(id =>
+    $(id).addEventListener('input', majApercu));
+  $('c-annee').addEventListener('input', rendrePuces);
+  $('c-vitrine').addEventListener('change', majApercu);
+
+  // Empêcher Entrée de soumettre depuis un champ texte simple
+  $('formulaire').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.tagName === 'INPUT') e.preventDefault();
+  });
+
+  charger();
+  </script>
+  <!-- Repli lecture seule si la page est ouverte sans serveur -->
+  <script src="montres.js"></script>
+</body>
+</html>

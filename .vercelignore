@@ -1,0 +1,7 @@
+# montres.js est généré à la volée par /api/montres-js en prod
+montres.js
+# outillage local uniquement
+server.py
+photos
+.playwright-mcp
+node_modules

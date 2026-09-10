@@ -242,6 +242,8 @@
           <div id="image-principale" class="voile-img aspect-[4/5] bg-white border border-platine/30">
             <img id="img-montre" src="" alt="" class="w-full h-full object-cover">
           </div>
+          <!-- Galerie (si la pièce a plusieurs photos) -->
+          <div id="galerie" class="hidden mt-3 grid grid-cols-5 gap-3"></div>
         </div>
 
         <!-- Contenu -->
@@ -328,8 +330,26 @@
       img.src = montre.image;
       img.alt = montre.alt;
       const ambiance = document.getElementById('img-ambiance');
-      ambiance.src = montre.ambiance;
+      ambiance.src = montre.ambiance || montre.image;
       ambiance.alt = 'Détail horloger — ' + nomComplet;
+
+      // Galerie : miniatures cliquables si la pièce a plusieurs photos
+      const toutesPhotos = [montre.image, ...(montre.galerie || [])];
+      if (toutesPhotos.length > 1) {
+        const galerie = document.getElementById('galerie');
+        galerie.classList.remove('hidden');
+        galerie.innerHTML = toutesPhotos.map((url, i) => `
+          <button data-photo="${i}" class="img-zoom aspect-[4/5] bg-white border ${i === 0 ? 'border-noir' : 'border-platine/30'}" aria-label="Photo ${i + 1}">
+            <img src="${url}" alt="" loading="lazy" class="w-full h-full object-cover">
+          </button>`).join('');
+        galerie.querySelectorAll('[data-photo]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            img.src = toutesPhotos[+btn.dataset.photo];
+            galerie.querySelectorAll('[data-photo]').forEach(b => b.classList.replace('border-noir', 'border-platine/30'));
+            btn.classList.replace('border-platine/30', 'border-noir');
+          });
+        });
+      }
 
       // Titre mot à mot (façon BlurText)
       const titre = document.getElementById('titre');
