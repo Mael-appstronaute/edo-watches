@@ -1,38 +1,42 @@
 // ============================================================
 // EDO WATCHES — accès aux données (Vercel Blob)
-// Le blob « edo/donnees.json » est la source de vérité en prod.
-// Au premier accès, il est semé depuis montres.json du dépôt.
+// Chaque sauvegarde écrit un blob « edo/donnees-<timestamp>.json »
+// inédit : une URL jamais vue = pas de cache CDN périmé.
+// La lecture liste le préfixe et prend le plus récent.
+// Au premier accès, le catalogue est semé depuis montres.json.
 // ============================================================
 
-const { put, head } = require('@vercel/blob');
+const { put, list, del } = require('@vercel/blob');
 const graine = require('../montres.json');
 
-const CHEMIN_BLOB = 'edo/donnees.json';
+const PREFIXE = 'edo/donnees-';
 
 async function chargerDonnees() {
-  try {
-    const meta = await head(CHEMIN_BLOB);
-    // Cache CDN contourné : l'URL varie à chaque lecture
-    const r = await fetch(meta.url + '?v=' + Date.now(), { cache: 'no-store' });
-    if (!r.ok) throw new Error('Lecture du blob impossible');
-    return await r.json();
-  } catch (e) {
-    if (e && (e.name === 'BlobNotFoundError' || /not.*found|does not exist/i.test(String(e.message)))) {
-      await sauvegarderDonnees(graine);
-      return JSON.parse(JSON.stringify(graine));
-    }
-    throw e;
+  const { blobs } = await list({ prefix: PREFIXE });
+  if (!blobs.length) {
+    await sauvegarderDonnees(graine);
+    return JSON.parse(JSON.stringify(graine));
   }
+  // Les noms sont horodatés : le plus grand = le plus récent
+  blobs.sort((a, b) => (a.pathname < b.pathname ? 1 : -1));
+  const r = await fetch(blobs[0].url, { cache: 'no-store' });
+  if (!r.ok) throw new Error('Lecture du catalogue impossible');
+  return await r.json();
 }
 
 async function sauvegarderDonnees(donnees) {
-  await put(CHEMIN_BLOB, JSON.stringify(donnees, null, 2), {
+  await put(PREFIXE + Date.now() + '.json', JSON.stringify(donnees, null, 2), {
     access: 'public',
-    allowOverwrite: true,
     addRandomSuffix: false,
     contentType: 'application/json',
-    cacheControlMaxAge: 60,
   });
+  // Ménage best-effort : on ne garde que les 3 versions les plus récentes
+  try {
+    const { blobs } = await list({ prefix: PREFIXE });
+    blobs.sort((a, b) => (a.pathname < b.pathname ? 1 : -1));
+    const anciens = blobs.slice(3).map(b => b.url);
+    if (anciens.length) await del(anciens);
+  } catch (e) { /* le ménage peut échouer sans conséquence */ }
 }
 
 // Clé d'accès du dashboard : requise pour toute écriture
