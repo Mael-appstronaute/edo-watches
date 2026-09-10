@@ -37,9 +37,9 @@ async function sauvegarderDonnees(donnees) {
 
 // Clé d'accès du dashboard : requise pour toute écriture
 function verifierCle(req, res) {
-  const attendue = process.env.EDO_ADMIN_CLE;
+  const attendue = (process.env.EDO_ADMIN_CLE || '').trim();
   if (!attendue) return true; // pas encore configurée → accès libre (préprod)
-  if ((req.headers['x-edo-cle'] || '') === attendue) return true;
+  if ((req.headers['x-edo-cle'] || '').trim() === attendue) return true;
   res.status(401).json({ erreur: 'Clé d’accès requise' });
   return false;
 }
