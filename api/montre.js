@@ -26,6 +26,8 @@ module.exports = async (req, res) => {
       if (!Array.isArray(montre.galerie)) montre.galerie = [];
       if (typeof montre.enVitrine !== 'boolean') montre.enVitrine = false;
       if (!montre.ambiance) montre.ambiance = montre.image || '';
+      if (!['disponible', 'reservee', 'vendue'].includes(montre.statut)) montre.statut = 'disponible';
+      if (montre.statut === 'vendue') montre.enVitrine = false;
 
       donnees.montres[slug] = montre;
       await sauvegarderDonnees(donnees);

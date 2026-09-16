@@ -146,10 +146,12 @@
       <nav class="px-8 py-8 flex lg:flex-col gap-6 text-[11px] tracking-luxe uppercase">
         <button data-nav="liste" class="lien-vue text-left hover:text-platine transition-colors">La collection</button>
         <button data-nav="form" class="lien-vue text-left text-white/50 hover:text-platine transition-colors">Ajouter une pièce</button>
+        <button data-nav="marques" class="lien-vue text-left text-white/50 hover:text-platine transition-colors">Les maisons</button>
       </nav>
       <div class="mt-auto px-8 py-8 border-t border-white/10 hidden lg:block">
         <a href="index.html" target="_blank" class="text-[11px] tracking-luxe uppercase text-white/50 hover:text-platine transition-colors">Voir le site →</a>
         <p id="pied-compte" class="mt-4 text-[11px] text-white/30"></p>
+        <button id="btn-deconnexion" class="hidden mt-4 text-[11px] tracking-luxe uppercase text-white/30 hover:text-platine transition-colors">Se déconnecter</button>
       </div>
     </aside>
 
@@ -369,6 +371,15 @@
             <!-- Publication -->
             <fieldset>
               <legend class="text-[11px] tracking-luxe uppercase mb-8 border-b border-platine/40 pb-3 w-full">06 — Publication</legend>
+              <div class="max-w-xs mb-8">
+                <label class="etiquette" for="c-statut">Statut de la pièce</label>
+                <select id="c-statut" class="champ">
+                  <option value="disponible">Disponible</option>
+                  <option value="reservee">Réservée</option>
+                  <option value="vendue">Vendue</option>
+                </select>
+                <p class="mt-2 text-[11px] text-gris">Réservée : visible avec un badge. Vendue : retirée du catalogue et de la vitrine, la fiche reste accessible par son lien.</p>
+              </div>
               <label class="flex items-center gap-4 cursor-pointer select-none">
                 <input id="c-vitrine" type="checkbox" class="sr-only">
                 <span class="interrupteur"></span>
@@ -399,9 +410,50 @@
         </div>
       </section>
 
+      <!-- ==================== VUE : LES MAISONS ==================== -->
+      <section id="vue-marques" class="hidden">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p class="text-[11px] tracking-luxe uppercase text-gris mb-4">Dashboard</p>
+            <h1 class="font-serif font-light tracking-tight" style="font-size: clamp(2.2rem, 4vw, 3.5rem);">Les <em class="italic">maisons</em></h1>
+          </div>
+        </div>
+        <p class="mt-8 max-w-xl text-[13px] text-gris leading-relaxed">
+          Les maisons alimentent le menu du site et le filtre du catalogue.
+          Le logo est récupéré automatiquement depuis le site officiel : modifiez le domaine pour le corriger.
+          Une maison ne peut être retirée que si aucune pièce du catalogue ne l'utilise.
+        </p>
+
+        <div id="liste-marques" class="mt-12 border-t border-platine/40 max-w-3xl"></div>
+
+        <div class="mt-14 max-w-md border border-platine/50 bg-white p-6">
+          <p class="text-[11px] tracking-luxe uppercase mb-5">Ajouter une maison</p>
+          <div class="space-y-4">
+            <input id="m-nom" class="champ" placeholder="Nom de la maison (ex. Zenith)">
+            <div class="flex items-center gap-3">
+              <input id="m-domaine" class="champ" placeholder="Site officiel (ex. zenith-watches.com)">
+              <img id="m-apercu-logo" class="h-6 w-6 object-contain hidden" alt="">
+            </div>
+            <button id="btn-ajouter-marque" class="btn btn-contour !py-2 !px-4">Ajouter la maison</button>
+          </div>
+        </div>
+      </section>
+
       <!-- Toast -->
       <div id="toast" class="hidden toast fixed bottom-8 right-8 z-50 bg-noir text-ivoire px-7 py-5 text-[12px] tracking-wide max-w-sm"></div>
     </main>
+  </div>
+
+  <!-- ==================== VERROU (clé d'accès) ==================== -->
+  <div id="verrou" class="hidden fixed inset-0 z-[60] bg-noir text-ivoire grid place-items-center">
+    <form id="form-verrou" class="w-[min(90vw,380px)] text-center">
+      <p class="font-serif text-2xl tracking-logo uppercase">Edo&nbsp;Watches</p>
+      <p class="mt-3 text-[9px] tracking-[0.4em] uppercase text-white/40">Dashboard privé</p>
+      <input id="verrou-cle" type="password" autocomplete="current-password" placeholder="Clé d’accès"
+             class="mt-12 w-full bg-transparent border-0 border-b border-white/30 focus:border-ivoire outline-none text-center py-3 text-[14px] tracking-[0.3em] placeholder:tracking-[0.2em] placeholder:text-white/30">
+      <p id="verrou-erreur" class="hidden mt-5 text-[12px] text-white/60">Clé incorrecte, réessayez.</p>
+      <button class="btn mt-10 border border-ivoire text-ivoire hover:bg-ivoire hover:text-noir bg-transparent">Entrer</button>
+    </form>
   </div>
 
   <script>
@@ -415,6 +467,9 @@
   const urlLogo = (d) => 'https://www.google.com/s2/favicons?domain=' + d + '&sz=128';
 
   let DONNEES = { marques: [], montres: {} };
+  const EST_LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
+  const STATUTS = { disponible: 'Disponible', reservee: 'Réservée', vendue: 'Vendue' };
+  const statutDe = (m) => m.statut || 'disponible';
   let slugEdite = null;        // slug de la pièce en cours d'édition (null = création)
   let photos = [];             // URLs, la première = principale
   let setItems = [];           // lignes « set & provenance »
@@ -440,12 +495,34 @@
       DONNEES = await r.json();
     } catch {
       $('alerte-serveur').classList.remove('hidden');
+      if (!EST_LOCAL) {
+        $('alerte-serveur').innerHTML =
+          '<p class="font-medium tracking-wide uppercase text-[11px] tracking-luxe mb-2">Catalogue indisponible</p>'
+          + 'L’API n’a pas répondu. Rechargez la page dans quelques instants.';
+      }
       // Repli lecture seule : montres.js si la page est ouverte sans serveur
       if (typeof MONTRES !== 'undefined') DONNEES = { marques: MARQUES, montres: MONTRES };
     }
     rendreListe();
     remplirMarques();
     remplirCouleurs();
+    rendreMarques();
+  }
+
+  // ---------- Clé d'accès : écran de verrouillage ----------
+  async function verifierAcces() {
+    try {
+      const cle = localStorage.getItem('edoCle') || '';
+      const r = await fetch('/api/cle', { headers: cle ? { 'x-edo-cle': cle } : {} });
+      if (r.status === 401) return montrerVerrou();
+      const j = await r.json();
+      $('btn-deconnexion').classList.toggle('hidden', !!j.libre);
+    } catch { /* serveur absent : le bandeau du catalogue s'en charge */ }
+  }
+
+  function montrerVerrou() {
+    $('verrou').classList.remove('hidden');
+    $('verrou-cle').focus();
   }
 
   function fmtPrix(n) {
@@ -459,14 +536,15 @@
     const entrees = Object.entries(DONNEES.montres);
     const filtre = $('recherche').value.trim().toLowerCase();
 
-    // Statistiques
-    const total = entrees.reduce((s, [, m]) => s + (m.prixNum || 0), 0);
+    // Statistiques (le stock exclut les pièces vendues)
+    const stock = entrees.filter(([, m]) => statutDe(m) !== 'vendue');
+    const total = stock.reduce((s, [, m]) => s + (m.prixNum || 0), 0);
     const enVitrine = entrees.filter(([, m]) => m.enVitrine).length;
     const nbMarques = new Set(entrees.map(([, m]) => m.marque)).size;
     $('stats').innerHTML = [
-      ['Pièces en stock', entrees.length],
+      ['Pièces en stock', stock.length],
       ['Valeur du stock', fmtPrix(total)],
-      ['Prix moyen', entrees.length ? fmtPrix(total / entrees.length) : '—'],
+      ['Pièces vendues', entrees.length - stock.length],
       ['Vitrine accueil', enVitrine + ' / 6'],
     ].map(([k, v]) => `
       <div class="border-r border-b border-platine/40 px-6 py-7 bg-ivoire">
@@ -482,7 +560,7 @@
     });
 
     $('liste-pieces').innerHTML = visibles.map(([slug, m]) => `
-      <div class="ligne-piece grid grid-cols-[auto_64px_1fr_auto] items-center gap-5 border-b border-platine/40 py-4 pr-2"
+      <div class="ligne-piece grid grid-cols-[auto_64px_1fr_auto] items-center gap-5 border-b border-platine/40 py-4 pr-2${statutDe(m) === 'vendue' ? ' opacity-60' : ''}"
            draggable="${filtre ? 'false' : 'true'}" data-slug="${esc(slug)}">
         <span class="poignee text-platine px-1 text-lg leading-none select-none" title="Glisser pour réordonner">⠿</span>
         <div class="nb w-16 h-20 bg-white border border-platine/30 overflow-hidden">
@@ -493,11 +571,17 @@
           <p class="mt-0.5 text-[12px] text-gris truncate">${esc(m.sousTitre)}</p>
           <p class="mt-1 text-[13px]">${esc(m.prix)}
             ${m.enVitrine ? '<span class="ml-3 text-[9px] tracking-luxe uppercase border border-noir px-2 py-0.5">Vitrine</span>' : ''}
+            ${statutDe(m) === 'reservee' ? '<span class="ml-3 text-[9px] tracking-luxe uppercase border border-gris text-gris px-2 py-0.5">Réservée</span>' : ''}
+            ${statutDe(m) === 'vendue' ? '<span class="ml-3 text-[9px] tracking-luxe uppercase bg-noir text-ivoire px-2 py-0.5">Vendue</span>' : ''}
           </p>
         </div>
         <div class="flex items-center gap-4 text-[10px] tracking-luxe uppercase">
+          <select class="act-statut hidden lg:inline bg-transparent border-0 text-gris hover:text-noir cursor-pointer uppercase tracking-luxe text-[10px]" title="Changer le statut">
+            ${Object.entries(STATUTS).map(([v, l]) => `<option value="${v}" ${statutDe(m) === v ? 'selected' : ''}>${l}</option>`).join('')}
+          </select>
           <a href="montre.html?m=${esc(slug)}" target="_blank" class="text-gris hover:text-noir transition-colors hidden sm:inline">Fiche</a>
           <button class="act-vitrine text-gris hover:text-noir transition-colors hidden sm:inline">${m.enVitrine ? 'Retirer vitrine' : 'Vitrine'}</button>
+          <button class="act-dupliquer text-gris hover:text-noir transition-colors hidden sm:inline">Dupliquer</button>
           <button class="act-modifier border-b border-noir pb-px hover:text-gris hover:border-gris transition-colors">Modifier</button>
           <button class="act-supprimer text-gris hover:text-noir transition-colors" title="Supprimer">✕</button>
         </div>
@@ -513,7 +597,9 @@
       if (!slug) return;
       ligne.querySelector('.act-modifier')?.addEventListener('click', () => ouvrirFormulaire(slug));
       ligne.querySelector('.act-vitrine')?.addEventListener('click', () => basculerVitrine(slug));
-      ligne.querySelector('.act-supprimer')?.addEventListener('click', () => supprimerPiece(slug, ligne));
+      ligne.querySelector('.act-dupliquer')?.addEventListener('click', () => ouvrirFormulaire(slug, true));
+      ligne.querySelector('.act-statut')?.addEventListener('change', (e) => changerStatut(slug, e.target.value));
+      ligne.querySelector('.act-statut')?.addEventListener('click', (e) => e.stopPropagation());
 
       // Drag & drop — réordonnancement
       ligne.addEventListener('dragstart', () => ligne.classList.add('fantome'));
@@ -542,8 +628,20 @@
     await appelApi('/api/ordre', 'POST', { slugs });
   }
 
+  async function changerStatut(slug, statut) {
+    const m = DONNEES.montres[slug];
+    m.statut = statut;
+    if (statut === 'vendue') m.enVitrine = false;
+    const r = await appelApi('/api/montre', 'POST', { slug, montre: m });
+    rendreListe();
+    if (r) toast('Statut mis à jour : ' + STATUTS[statut] + '.');
+  }
+
   async function basculerVitrine(slug) {
     const m = DONNEES.montres[slug];
+    if (statutDe(m) === 'vendue' && !m.enVitrine) {
+      return toast('Une pièce vendue ne peut pas être mise en vitrine.');
+    }
     m.enVitrine = !m.enVitrine;
     // Vitrine limitée à 6 : on retire la plus ancienne sélection si besoin
     const vitrine = Object.entries(DONNEES.montres).filter(([, x]) => x.enVitrine);
@@ -584,14 +682,61 @@
     $('l-couleurs').innerHTML = [...couleurs].map(c => `<option value="${esc(c)}"></option>`).join('');
   }
 
-  function ouvrirFormulaire(slug = null) {
-    slugEdite = slug;
-    const m = slug ? DONNEES.montres[slug] : null;
+  // ============================================================
+  // VUE LES MAISONS
+  // ============================================================
+  function rendreMarques() {
+    const compte = {};
+    Object.values(DONNEES.montres).forEach(m => compte[m.marque] = (compte[m.marque] || 0) + 1);
 
-    $('titre-form').innerHTML = m ? 'Modifier la <em class="italic">pièce</em>' : 'Ajouter une <em class="italic">pièce</em>';
-    $('fil-form').textContent = m ? (m.marque + ' ' + m.nom) : 'Nouvelle pièce';
-    $('btn-enregistrer').textContent = m ? 'Enregistrer les modifications' : 'Publier la pièce';
-    $('btn-supprimer').classList.toggle('hidden', !m);
+    $('liste-marques').innerHTML = DONNEES.marques.map(m => `
+      <div class="ligne-piece grid grid-cols-[40px_1fr_auto] sm:grid-cols-[40px_1fr_220px_auto] items-center gap-5 border-b border-platine/40 py-4 pr-2" data-marque="${esc(m.nom)}">
+        <img src="${urlLogo(m.domaine)}" alt="" class="h-7 w-7 object-contain">
+        <div class="min-w-0">
+          <p class="font-serif text-lg leading-tight truncate">${esc(m.nom)}</p>
+          <p class="text-[11px] text-gris">${compte[m.nom] || 0} pièce${(compte[m.nom] || 0) > 1 ? 's' : ''} au catalogue</p>
+        </div>
+        <input class="dom-marque champ hidden sm:block !py-1 text-[12px]" value="${esc(m.domaine)}"
+               title="Domaine du site officiel — validez avec Entrée">
+        <button class="sup-marque text-gris hover:text-noir transition-colors text-[12px] ${compte[m.nom] ? 'opacity-30 pointer-events-none' : ''}"
+                title="${compte[m.nom] ? 'Utilisée par des pièces du catalogue' : 'Retirer cette maison'}">✕</button>
+      </div>`).join('') || '<p class="py-10 text-gris text-[14px]">Aucune maison pour l’instant.</p>';
+
+    $('liste-marques').querySelectorAll('[data-marque]').forEach(ligne => {
+      const nom = ligne.dataset.marque;
+      ligne.querySelector('.dom-marque')?.addEventListener('keydown', async (e) => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        const domaine = e.target.value.trim();
+        const r = await appelApi('/api/marque', 'PUT', { nom, domaine });
+        if (!r) return;
+        const marque = DONNEES.marques.find(x => x.nom === nom);
+        if (marque && domaine) marque.domaine = domaine.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+        rendreMarques();
+        toast('Domaine mis à jour pour ' + nom + ' : le logo du site suivra.');
+      });
+      ligne.querySelector('.sup-marque')?.addEventListener('click', async () => {
+        if (!confirm('Retirer la maison « ' + nom + ' » du menu du site ?')) return;
+        const r = await appelApi('/api/marque?nom=' + encodeURIComponent(nom), 'DELETE');
+        if (!r) return;
+        DONNEES.marques = DONNEES.marques.filter(x => x.nom !== nom);
+        remplirMarques();
+        rendreMarques();
+        toast('Maison retirée du site.');
+      });
+    });
+  }
+
+  function ouvrirFormulaire(slug = null, dupliquer = false) {
+    const m = slug ? DONNEES.montres[slug] : null;
+    slugEdite = dupliquer ? null : slug;
+
+    $('titre-form').innerHTML = slugEdite ? 'Modifier la <em class="italic">pièce</em>'
+      : (dupliquer ? 'Dupliquer une <em class="italic">pièce</em>' : 'Ajouter une <em class="italic">pièce</em>');
+    $('fil-form').textContent = slugEdite ? (m.marque + ' ' + m.nom)
+      : (dupliquer ? 'Copie de ' + m.marque + ' ' + m.nom : 'Nouvelle pièce');
+    $('btn-enregistrer').textContent = slugEdite ? 'Enregistrer les modifications' : 'Publier la pièce';
+    $('btn-supprimer').classList.toggle('hidden', !slugEdite);
     $('erreurs-form').classList.add('hidden');
 
     // Champs
@@ -609,7 +754,8 @@
     $('c-etat').value = m?.specs?.['État'] || '';
     $('c-ambiance').value = (m?.ambiance && m.ambiance !== m.image) ? m.ambiance : '';
     $('c-description').value = (m?.description || []).join('\n\n');
-    $('c-vitrine').checked = !!m?.enVitrine;
+    $('c-vitrine').checked = dupliquer ? false : !!m?.enVitrine;
+    $('c-statut').value = dupliquer ? 'disponible' : (m?.statut || 'disponible');
 
     photos = m ? [m.image, ...(m.galerie || [])].filter(Boolean) : [];
     setItems = m ? [...(m.set || [])] : [];
@@ -802,10 +948,13 @@
     $('apercu-prix').textContent = prix ? fmtPrix(prix) : '—';
 
     const image = photos[0] || '';
+    const statutForm = $('c-statut').value;
     $('apercu-carte').innerHTML = `
-      <div class="img-zoom nb aspect-[4/5] bg-white border border-platine/30">
+      <div class="img-zoom nb relative aspect-[4/5] bg-white border border-platine/30">
         ${image ? `<img src="${esc(image)}" alt="" class="w-full h-full object-cover">`
                 : '<div class="w-full h-full grid place-items-center text-[11px] tracking-luxe uppercase text-platine">Photo à venir</div>'}
+        ${statutForm === 'reservee' ? '<span class="absolute top-3 left-3 bg-ivoire border border-noir text-noir text-[9px] tracking-luxe uppercase px-3 py-1.5">Réservée</span>' : ''}
+        ${statutForm === 'vendue' ? '<span class="absolute top-3 left-3 bg-noir text-ivoire text-[9px] tracking-luxe uppercase px-3 py-1.5">Vendue</span>' : ''}
       </div>
       <div class="mt-6">
         <h3 class="font-serif text-xl font-normal">${esc(($('c-marque').value || 'Marque') + ' ' + ($('c-nom').value || 'Modèle'))}</h3>
@@ -871,7 +1020,8 @@
       alt: composerAlt(),
       ambiance: $('c-ambiance').value.trim(),
       galerie: photos.slice(1),
-      enVitrine: $('c-vitrine').checked,
+      statut: $('c-statut').value,
+      enVitrine: $('c-statut').value === 'vendue' ? false : $('c-vitrine').checked,
       description,
       specs: composerSpecs(),
       set: setItems,
@@ -951,6 +1101,7 @@
   function basculerVue(vue) {
     $('vue-liste').classList.toggle('hidden', vue !== 'liste');
     $('vue-form').classList.toggle('hidden', vue !== 'form');
+    $('vue-marques').classList.toggle('hidden', vue !== 'marques');
     document.querySelectorAll('.lien-vue').forEach(b =>
       b.classList.toggle('text-white/50', b.dataset.nav !== vue));
     window.scrollTo({ top: 0 });
@@ -963,7 +1114,7 @@
   $('retour-liste').addEventListener('click', () => basculerVue('liste'));
   $('btn-annuler').addEventListener('click', () => basculerVue('liste'));
   document.querySelectorAll('.lien-vue').forEach(b =>
-    b.addEventListener('click', () => b.dataset.nav === 'form' ? ouvrirFormulaire() : basculerVue('liste')));
+    b.addEventListener('click', () => b.dataset.nav === 'form' ? ouvrirFormulaire() : basculerVue(b.dataset.nav)));
   $('recherche').addEventListener('input', rendreListe);
   $('formulaire').addEventListener('submit', enregistrer);
   $('btn-rediger').addEventListener('click', redigerBrouillon);
@@ -1030,6 +1181,59 @@
     if ($('c-provenance').value) { ajouterSet($('c-provenance').value); $('c-provenance').value = ''; }
   });
 
+  // Statut : une pièce vendue quitte la vitrine
+  $('c-statut').addEventListener('change', () => {
+    if ($('c-statut').value === 'vendue' && $('c-vitrine').checked) {
+      $('c-vitrine').checked = false;
+      toast('Pièce vendue : elle est retirée de la vitrine de l’accueil.');
+    }
+    majApercu();
+  });
+
+  // Vue « Les maisons » : ajout d'une maison
+  $('m-domaine').addEventListener('input', () => {
+    const d = $('m-domaine').value.trim().replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+    const img = $('m-apercu-logo');
+    img.classList.toggle('hidden', !d);
+    if (d) img.src = urlLogo(d);
+  });
+  $('btn-ajouter-marque').addEventListener('click', async () => {
+    const nom = $('m-nom').value.trim();
+    if (!nom) return toast('⚠ Indiquez le nom de la maison.');
+    const domaine = $('m-domaine').value.trim();
+    const r = await appelApi('/api/marque', 'POST', { nom, domaine });
+    if (!r) return;
+    if (!DONNEES.marques.some(m => m.nom.toLowerCase() === nom.toLowerCase()))
+      DONNEES.marques.push({ nom, domaine: domaine.replace(/^https?:\/\/(www\.)?/, '').split('/')[0] || 'watch.com' });
+    remplirMarques();
+    rendreMarques();
+    $('m-nom').value = ''; $('m-domaine').value = ''; $('m-apercu-logo').classList.add('hidden');
+    toast('Maison « ' + nom + ' » ajoutée : elle apparaît dans le menu du site.');
+  });
+
+  // Verrou : saisie et vérification de la clé
+  $('form-verrou').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const cle = $('verrou-cle').value.trim();
+    if (!cle) return;
+    const r = await fetch('/api/cle', { headers: { 'x-edo-cle': cle } }).catch(() => null);
+    if (r && r.ok) {
+      localStorage.setItem('edoCle', cle);
+      $('verrou').classList.add('hidden');
+      $('verrou-erreur').classList.add('hidden');
+      $('btn-deconnexion').classList.remove('hidden');
+      charger();
+    } else {
+      $('verrou-erreur').classList.remove('hidden');
+      $('verrou-cle').select();
+    }
+  });
+  $('btn-deconnexion').addEventListener('click', () => {
+    localStorage.removeItem('edoCle');
+    $('verrou-cle').value = '';
+    montrerVerrou();
+  });
+
   // Modes auto (sous-titre / matière)
   $('c-sous-titre').addEventListener('input', () => { sousTitreManuel = !!$('c-sous-titre').value.trim(); majApercu(); });
   $('c-matiere').addEventListener('change', () => { matiereManuelle = true; majBadges(); majApercu(); });
@@ -1045,6 +1249,7 @@
     if (e.key === 'Enter' && e.target.tagName === 'INPUT') e.preventDefault();
   });
 
+  verifierAcces();
   charger();
   </script>
   <!-- Repli lecture seule si la page est ouverte sans serveur -->

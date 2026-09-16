@@ -520,7 +520,8 @@
   <script src="site.js"></script>
   <script>
     // ---------- Vitrine de l'accueil (6 pièces max, gérée depuis le dashboard) ----------
-    const entreesVitrine = Object.entries(MONTRES);
+    // Les pièces vendues n'apparaissent jamais sur l'accueil
+    const entreesVitrine = Object.entries(MONTRES).filter(([, m]) => (m.statut || 'disponible') !== 'vendue');
     const selection = entreesVitrine.filter(([, m]) => m.enVitrine).slice(0, 6);
     // Complète avec les premières pièces du catalogue si la vitrine n'est pas pleine
     for (const e of entreesVitrine) {
@@ -529,8 +530,9 @@
     }
     document.getElementById('grille-selection').innerHTML = selection.map(([slug, m]) => `
       <a href="montre.html?m=${slug}" class="carte-produit group block reveal">
-        <div class="img-zoom aspect-[4/5] bg-white border border-platine/30">
+        <div class="img-zoom relative aspect-[4/5] bg-white border border-platine/30">
           <img src="${m.image.replace('w=1600', 'w=1200')}" alt="${m.alt}" loading="lazy" class="w-full h-full object-cover">
+          ${m.statut === 'reservee' ? '<span class="absolute top-3 left-3 z-10 bg-ivoire border border-noir text-noir text-[9px] tracking-luxe uppercase px-3 py-1.5">Réservée</span>' : ''}
         </div>
         <div class="mt-6">
           <h3 class="font-serif text-xl font-normal">${m.marque} ${m.nom}</h3>

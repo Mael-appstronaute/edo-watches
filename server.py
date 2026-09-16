@@ -87,8 +87,12 @@ class Requete(SimpleHTTPRequestHandler):
 
     # ---------- Routage ----------
     def do_GET(self):
-        if urlparse(self.path).path == '/api/data':
+        route = urlparse(self.path).path
+        if route == '/api/data':
             return self.repondre_json(charger())
+        if route == '/api/cle':
+            # En local, pas de clé : accès libre
+            return self.repondre_json({'ok': True, 'libre': True})
         super().do_GET()
 
     def do_POST(self):
@@ -116,6 +120,36 @@ class Requete(SimpleHTTPRequestHandler):
             del donnees['montres'][slug]
             sauvegarder(donnees)
             return self.repondre_json({'ok': True})
+        if analyse.path == '/api/marque':
+            nom = parse_qs(analyse.query).get('nom', [''])[0].strip()
+            donnees = charger()
+            index = next((i for i, m in enumerate(donnees['marques'])
+                          if m['nom'].lower() == nom.lower()), -1)
+            if index < 0:
+                return self.repondre_json({'erreur': 'Marque introuvable'}, 404)
+            if any(m['marque'] == donnees['marques'][index]['nom'] for m in donnees['montres'].values()):
+                return self.repondre_json({'erreur': 'Des pièces du catalogue utilisent encore cette marque'}, 400)
+            del donnees['marques'][index]
+            sauvegarder(donnees)
+            return self.repondre_json({'ok': True})
+        self.repondre_json({'erreur': 'Route inconnue'}, 404)
+
+    def do_PUT(self):
+        if urlparse(self.path).path == '/api/marque':
+            try:
+                corps = json.loads(self.lire_corps())
+                nom = (corps.get('nom') or '').strip()
+                domaine = re.sub(r'^https?://(www\.)?', '', (corps.get('domaine') or '').strip().lower()).split('/')[0]
+                donnees = charger()
+                marque = next((m for m in donnees['marques'] if m['nom'].lower() == nom.lower()), None)
+                if not marque:
+                    return self.repondre_json({'erreur': 'Marque introuvable'}, 404)
+                if domaine:
+                    marque['domaine'] = domaine
+                sauvegarder(donnees)
+                return self.repondre_json({'ok': True})
+            except Exception as e:
+                return self.repondre_json({'erreur': str(e)}, 500)
         self.repondre_json({'erreur': 'Route inconnue'}, 404)
 
     # ---------- API ----------
@@ -144,6 +178,10 @@ class Requete(SimpleHTTPRequestHandler):
         montre.setdefault('enVitrine', False)
         if not montre.get('ambiance'):
             montre['ambiance'] = montre.get('image', '')
+        if montre.get('statut') not in ('disponible', 'reservee', 'vendue'):
+            montre['statut'] = 'disponible'
+        if montre['statut'] == 'vendue':
+            montre['enVitrine'] = False
 
         donnees['montres'][slug] = montre
         sauvegarder(donnees)

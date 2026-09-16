@@ -326,6 +326,16 @@
       document.getElementById('sous-titre').textContent = montre.sousTitre;
       document.getElementById('prix').textContent = montre.prix;
 
+      // Statut : bandeau et appel à l'action adaptés
+      const statut = montre.statut || 'disponible';
+      if (statut !== 'disponible') {
+        const badge = document.createElement('p');
+        badge.className = 'mt-5 inline-block px-4 py-2 text-[10px] tracking-luxe uppercase reveal '
+          + (statut === 'vendue' ? 'bg-noir text-ivoire' : 'border border-noir text-noir');
+        badge.textContent = statut === 'vendue' ? 'Pièce vendue' : 'Pièce réservée';
+        document.getElementById('prix').after(badge);
+      }
+
       const img = document.getElementById('img-montre');
       img.src = montre.image;
       img.alt = montre.alt;
@@ -374,11 +384,23 @@
         '<li class="flex items-center gap-4"><span class="block w-8 h-px bg-noir/40"></span>' + item + '</li>'
       ).join('');
 
-      document.getElementById('cta-whatsapp').href =
-        'https://wa.me/33600000000?text=' + encodeURIComponent('Bonjour, je souhaite des informations sur la ' + nomComplet + ' (' + montre.prix + ').');
+      const cta = document.getElementById('cta-whatsapp');
+      if (statut === 'vendue') {
+        cta.textContent = 'Sourcer une pièce similaire';
+        cta.href = 'https://wa.me/33600000000?text=' + encodeURIComponent(
+          'Bonjour, la ' + nomComplet + ' est indiquée vendue. Pouvez-vous me sourcer une pièce similaire ?');
+      } else if (statut === 'reservee') {
+        cta.textContent = 'Être prévenu si elle se libère';
+        cta.href = 'https://wa.me/33600000000?text=' + encodeURIComponent(
+          'Bonjour, la ' + nomComplet + ' est indiquée réservée. Pouvez-vous me prévenir si elle se libère ?');
+      } else {
+        cta.href = 'https://wa.me/33600000000?text=' + encodeURIComponent(
+          'Bonjour, je souhaite des informations sur la ' + nomComplet + ' (' + montre.prix + ').');
+      }
 
-      // Suggestions : 3 autres pièces
-      const autres = Object.entries(MONTRES).filter(([s]) => s !== slug).slice(0, 3);
+      // Suggestions : 3 autres pièces encore disponibles
+      const autres = Object.entries(MONTRES)
+        .filter(([s, m]) => s !== slug && (m.statut || 'disponible') !== 'vendue').slice(0, 3);
       document.getElementById('suggestions').innerHTML = autres.map(([s, m]) => `
         <a href="montre.html?m=${s}" class="carte-produit group block reveal">
           <div class="img-zoom aspect-[4/5] bg-white border border-platine/30">
