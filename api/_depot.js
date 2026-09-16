@@ -7,6 +7,7 @@
 // ============================================================
 
 const { put, list, del } = require('@vercel/blob');
+const crypto = require('crypto');
 const graine = require('../montres.json');
 
 const PREFIXE = 'edo/donnees-';
@@ -39,12 +40,31 @@ async function sauvegarderDonnees(donnees) {
   } catch (e) { /* le ménage peut échouer sans conséquence */ }
 }
 
-// Clé d'accès du dashboard : requise pour toute écriture
+// Jeton de session : dérivé du couple identifiant + mot de passe
+// (env EDO_ADMIN_USER / EDO_ADMIN_MDP). Repli sur l'ancienne clé simple
+// EDO_ADMIN_CLE si le couple n'est pas configuré ; vide = accès libre (préprod).
+function jetonAttendu() {
+  const user = (process.env.EDO_ADMIN_USER || '').trim();
+  const mdp = (process.env.EDO_ADMIN_MDP || '').trim();
+  if (user && mdp) {
+    return crypto.createHash('sha256').update(user.toLowerCase() + ':' + mdp).digest('hex');
+  }
+  return (process.env.EDO_ADMIN_CLE || '').trim();
+}
+
+// Comparaison à temps constant (évite de fuiter la longueur/le préfixe)
+function memesSecrets(a, b) {
+  const ha = crypto.createHash('sha256').update(String(a)).digest();
+  const hb = crypto.createHash('sha256').update(String(b)).digest();
+  return crypto.timingSafeEqual(ha, hb);
+}
+
+// Jeton requis pour toute écriture
 function verifierCle(req, res) {
-  const attendue = (process.env.EDO_ADMIN_CLE || '').trim();
-  if (!attendue) return true; // pas encore configurée → accès libre (préprod)
-  if ((req.headers['x-edo-cle'] || '').trim() === attendue) return true;
-  res.status(401).json({ erreur: 'Clé d’accès requise' });
+  const attendue = jetonAttendu();
+  if (!attendue) return true;
+  if (memesSecrets((req.headers['x-edo-cle'] || '').trim(), attendue)) return true;
+  res.status(401).json({ erreur: 'Session expirée : reconnectez-vous' });
   return false;
 }
 
@@ -55,4 +75,4 @@ function slugifier(texte) {
     .toLowerCase() || 'piece';
 }
 
-module.exports = { chargerDonnees, sauvegarderDonnees, verifierCle, slugifier };
+module.exports = { chargerDonnees, sauvegarderDonnees, verifierCle, jetonAttendu, memesSecrets, slugifier };

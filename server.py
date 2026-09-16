@@ -98,6 +98,9 @@ class Requete(SimpleHTTPRequestHandler):
     def do_POST(self):
         route = urlparse(self.path).path
         try:
+            if route == '/api/connexion':
+                # En local, pas de compte : connexion toujours acceptée
+                return self.repondre_json({'ok': True, 'jeton': '', 'libre': True})
             if route == '/api/montre':
                 return self.api_montre()
             if route == '/api/marque':

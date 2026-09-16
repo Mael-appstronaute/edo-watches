@@ -444,15 +444,17 @@
     </main>
   </div>
 
-  <!-- ==================== VERROU (clé d'accès) ==================== -->
+  <!-- ==================== VERROU (connexion) ==================== -->
   <div id="verrou" class="hidden fixed inset-0 z-[60] bg-noir text-ivoire grid place-items-center">
     <form id="form-verrou" class="w-[min(90vw,380px)] text-center">
       <p class="font-serif text-2xl tracking-logo uppercase">Edo&nbsp;Watches</p>
       <p class="mt-3 text-[9px] tracking-[0.4em] uppercase text-white/40">Dashboard privé</p>
-      <input id="verrou-cle" type="password" autocomplete="current-password" placeholder="Clé d’accès"
-             class="mt-12 w-full bg-transparent border-0 border-b border-white/30 focus:border-ivoire outline-none text-center py-3 text-[14px] tracking-[0.3em] placeholder:tracking-[0.2em] placeholder:text-white/30">
-      <p id="verrou-erreur" class="hidden mt-5 text-[12px] text-white/60">Clé incorrecte, réessayez.</p>
-      <button class="btn mt-10 border border-ivoire text-ivoire hover:bg-ivoire hover:text-noir bg-transparent">Entrer</button>
+      <input id="verrou-identifiant" type="text" autocomplete="username" placeholder="Identifiant"
+             class="mt-12 w-full bg-transparent border-0 border-b border-white/30 focus:border-ivoire outline-none text-center py-3 text-[14px] tracking-[0.2em] placeholder:text-white/30">
+      <input id="verrou-mdp" type="password" autocomplete="current-password" placeholder="Mot de passe"
+             class="mt-6 w-full bg-transparent border-0 border-b border-white/30 focus:border-ivoire outline-none text-center py-3 text-[14px] tracking-[0.3em] placeholder:tracking-[0.2em] placeholder:text-white/30">
+      <p id="verrou-erreur" class="hidden mt-5 text-[12px] text-white/60">Identifiant ou mot de passe incorrect.</p>
+      <button class="btn mt-10 border border-ivoire text-ivoire hover:bg-ivoire hover:text-noir bg-transparent">Se connecter</button>
     </form>
   </div>
 
@@ -522,7 +524,7 @@
 
   function montrerVerrou() {
     $('verrou').classList.remove('hidden');
-    $('verrou-cle').focus();
+    $('verrou-identifiant').focus();
   }
 
   function fmtPrix(n) {
@@ -892,7 +894,7 @@
     });
   }
 
-  async function televerserFichiers(fichiers, deuxieme) {
+  async function televerserFichiers(fichiers) {
     for (const f of fichiers) {
       if (!f.type.startsWith('image/')) continue;
       toast('Téléversement de « ' + f.name + ' »…');
@@ -903,8 +905,9 @@
         if (cle) entetes['x-edo-cle'] = cle;
         const r = await fetch('/api/upload?nom=' + encodeURIComponent(nom), { method: 'POST', headers: entetes, body: blob });
         const j = await r.json();
-        if (r.status === 401 && !deuxieme) {
-          if (cleAdmin(true)) return televerserFichiers(fichiers, true);
+        if (r.status === 401) {
+          montrerVerrou();
+          throw new Error('Session expirée : reconnectez-vous puis recommencez.');
         }
         if (!r.ok) throw new Error(j.erreur || 'Échec du téléversement');
         photos.push(j.url);
@@ -1057,17 +1060,7 @@
   }
 
   // ---------- Utilitaires ----------
-  // Clé d'accès (prod Vercel) : demandée à la première écriture, retenue ensuite
-  function cleAdmin(forcer) {
-    let cle = localStorage.getItem('edoCle') || '';
-    if (!cle || forcer) {
-      cle = prompt('Clé d’accès du dashboard :', cle) || '';
-      if (cle) localStorage.setItem('edoCle', cle);
-    }
-    return cle;
-  }
-
-  async function appelApi(url, methode, corps, deuxieme) {
+  async function appelApi(url, methode, corps) {
     try {
       const entetes = corps ? { 'Content-Type': 'application/json' } : {};
       const cle = localStorage.getItem('edoCle');
@@ -1078,13 +1071,16 @@
         body: corps ? JSON.stringify(corps) : undefined,
       });
       const j = await r.json();
-      if (r.status === 401 && !deuxieme) {
-        if (cleAdmin(true)) return appelApi(url, methode, corps, true);
+      if (r.status === 401) {
+        montrerVerrou();
+        throw new Error('Session expirée : reconnectez-vous puis recommencez.');
       }
       if (!r.ok) throw new Error(j.erreur || 'Erreur serveur');
       return j;
     } catch (e) {
-      toast('⚠ ' + (e.message === 'Failed to fetch' ? 'Serveur introuvable — lancez python server.py' : e.message));
+      toast('⚠ ' + (e.message === 'Failed to fetch'
+        ? (EST_LOCAL ? 'Serveur introuvable — lancez python server.py' : 'API injoignable, réessayez.')
+        : e.message));
       return null;
     }
   }
@@ -1211,26 +1207,34 @@
     toast('Maison « ' + nom + ' » ajoutée : elle apparaît dans le menu du site.');
   });
 
-  // Verrou : saisie et vérification de la clé
+  // Verrou : connexion identifiant + mot de passe
   $('form-verrou').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const cle = $('verrou-cle').value.trim();
-    if (!cle) return;
-    const r = await fetch('/api/cle', { headers: { 'x-edo-cle': cle } }).catch(() => null);
-    if (r && r.ok) {
-      localStorage.setItem('edoCle', cle);
+    const identifiant = $('verrou-identifiant').value.trim();
+    const mdp = $('verrou-mdp').value;
+    if (!identifiant || !mdp) return;
+    const r = await fetch('/api/connexion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifiant, mdp }),
+    }).catch(() => null);
+    const j = r ? await r.json().catch(() => null) : null;
+    if (r && r.ok && j) {
+      localStorage.setItem('edoCle', j.jeton || '');
       $('verrou').classList.add('hidden');
       $('verrou-erreur').classList.add('hidden');
-      $('btn-deconnexion').classList.remove('hidden');
+      $('btn-deconnexion').classList.toggle('hidden', !!j.libre);
       charger();
     } else {
       $('verrou-erreur').classList.remove('hidden');
-      $('verrou-cle').select();
+      $('verrou-mdp').value = '';
+      $('verrou-mdp').focus();
     }
   });
   $('btn-deconnexion').addEventListener('click', () => {
     localStorage.removeItem('edoCle');
-    $('verrou-cle').value = '';
+    $('verrou-identifiant').value = '';
+    $('verrou-mdp').value = '';
     montrerVerrou();
   });
 
