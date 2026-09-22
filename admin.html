@@ -270,7 +270,7 @@
                   </datalist>
                 </div>
                 <div>
-                  <label class="etiquette" for="c-matiere">Matière (filtre site) <span class="badge-auto" id="badge-matiere">auto</span></label>
+                  <label class="etiquette" for="c-matiere">Matériau (filtre site) <span class="badge-auto" id="badge-matiere">auto</span></label>
                   <select id="c-matiere" class="champ">
                     <option>Acier</option><option>Or</option><option>Acier & or</option>
                     <option>Titane</option><option>Platine</option><option>Céramique</option>
@@ -546,13 +546,16 @@
     $('stats').innerHTML = [
       ['Pièces en stock', stock.length],
       ['Valeur du stock', fmtPrix(total)],
-      ['Pièces vendues', entrees.length - stock.length],
+      ['Pièces vendues', entrees.length - stock.length, 'vendues.html'],
       ['Vitrine accueil', enVitrine + ' / 6'],
-    ].map(([k, v]) => `
-      <div class="border-r border-b border-platine/40 px-6 py-7 bg-ivoire">
-        <p class="text-[10px] tracking-luxe uppercase text-gris">${k}</p>
-        <p class="mt-3 font-serif text-3xl font-light">${v}</p>
-      </div>`).join('');
+    ].map(([k, v, href]) => {
+      const contenu = `
+        <p class="text-[10px] tracking-luxe uppercase text-gris">${k}${href ? ' ↗' : ''}</p>
+        <p class="mt-3 font-serif text-3xl font-light">${v}</p>`;
+      return href
+        ? `<a href="${href}" target="_blank" title="Voir la page publique des pièces vendues" class="block border-r border-b border-platine/40 px-6 py-7 bg-ivoire hover:bg-white transition-colors">${contenu}</a>`
+        : `<div class="border-r border-b border-platine/40 px-6 py-7 bg-ivoire">${contenu}</div>`;
+    }).join('');
     $('pied-compte').textContent = entrees.length + ' pièces · ' + nbMarques + ' marques';
 
     // Lignes
@@ -748,7 +751,7 @@
     $('c-prix').value = m?.prixNum || '';
     $('c-annee').value = m?.annee || '';
     $('c-ref').value = m?.specs?.['Référence'] || '';
-    $('c-materiaux').value = m?.specs?.['Matière'] || '';
+    $('c-materiaux').value = m?.specs?.['Matériau'] || m?.specs?.['Matière'] || '';
     $('c-matiere').value = m?.matiere || 'Acier';
     $('c-couleur').value = m?.couleur || '';
     $('c-diametre').value = (m?.specs?.['Diamètre'] || '').replace(/\s*mm$/, '');
@@ -819,7 +822,7 @@
     const paires = [
       ['Référence', $('c-ref').value.trim() || $('c-nom').value.trim()],
       ['Année', $('c-annee').value],
-      ['Matière', $('c-materiaux').value.trim()],
+      ['Matériau', $('c-materiaux').value.trim()],
       ['Diamètre', diametre ? diametre.replace(/\s*mm$/, '') + ' mm' : ''],
       ['Mouvement', $('c-mouvement').value.trim()],
       ['État', $('c-etat').value.trim()],

@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catalogue — Montres de luxe à Aix-en-Provence | EDO WATCHES</title>
-  <meta name="description" content="Toutes nos montres de luxe disponibles à l'achat : Rolex, Audemars Piguet, Omega, IWC… Filtrez par marque, budget, couleur de cadran et matériau. Envoi offert et sécurisé, sur rendez-vous à Aix-en-Provence.">
-  <meta name="keywords" content="catalogue montres de luxe, montre occasion Aix-en-Provence, acheter Rolex, acheter Patek Philippe, Audemars Piguet occasion, montre de collection à vendre, EDO WATCHES">
+  <title>Nos pièces vendues — Montres de luxe | EDO WATCHES Aix-en-Provence</title>
+  <meta name="description" content="Les montres de luxe déjà vendues par EDO WATCHES à Aix-en-Provence : Rolex, Patek Philippe, Audemars Piguet… Une pièce similaire vous intéresse ? Nous la sourçons sur demande.">
 
   <link rel="icon" type="image/png" href="logo-edo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,13 +72,10 @@
     .btn-contour-noir { color: #0A0A0A; }
     .btn-contour-noir:hover { background: #0A0A0A; color: #FAFAF8; }
 
-    a:focus-visible, button:focus-visible, select:focus-visible {
+    a:focus-visible, button:focus-visible {
       outline: 1px solid #0A0A0A;
       outline-offset: 4px;
     }
-
-    .carte-produit .decouvrir { opacity: 0; transform: translateY(6px); transition: opacity 0.5s ease, transform 0.5s ease; }
-    .carte-produit:hover .decouvrir, .carte-produit:focus-within .decouvrir { opacity: 1; transform: translateY(0); }
 
     /* Header raffiné */
     .lien-nav { position: relative; padding-bottom: 4px; white-space: nowrap; }
@@ -100,26 +96,6 @@
     }
     .mega.ouverte { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
 
-    /* Filtres : selects épurés, soulignés */
-    .filtre {
-      appearance: none;
-      -webkit-appearance: none;
-      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9' viewBox='0 0 10 10'%3E%3Cpath d='m2 3.5 3 3 3-3' fill='none' stroke='%230A0A0A' stroke-width='1'/%3E%3C/svg%3E") no-repeat right 2px center;
-      border: 0;
-      border-bottom: 1px solid rgba(10, 10, 10, 0.25);
-      border-radius: 0;
-      padding: 0.7rem 1.4rem 0.7rem 0;
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #0A0A0A;
-      cursor: pointer;
-      transition: border-color 0.4s ease;
-      max-width: 100%;
-    }
-    .filtre:hover, .filtre:focus { border-bottom-color: #0A0A0A; outline: none; }
-
-    /* Apparition des cartes filtrées */
     @keyframes carte-in {
       from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
@@ -214,71 +190,38 @@
     </div>
   </div>
 
-  <!-- ============ CATALOGUE ============ -->
+  <!-- ============ PIÈCES VENDUES ============ -->
   <main class="pt-20 lg:pt-[8.25rem]">
 
     <!-- Titre -->
     <section class="mx-auto max-w-[1400px] px-6 lg:px-12 pt-14 lg:pt-24 pb-10 lg:pb-16">
-      <p class="text-[11px] tracking-luxe uppercase text-gris mb-6 reveal">Catalogue</p>
+      <p class="text-[11px] tracking-luxe uppercase text-gris mb-6 reveal">Références</p>
       <h1 class="font-serif font-light tracking-tight reveal" style="font-size: clamp(2.5rem, 5.5vw, 5rem);">
-        Toutes nos pièces
+        Nos pièces vendues
       </h1>
       <p class="mt-6 max-w-xl text-gris text-[15px] leading-[1.7] reveal">
-        Chaque montre est authentifiée et contrôlée.
-        La pièce que vous cherchez n'est pas en vitrine ? Nous la sourçons sur demande.
+        Ces montres ont trouvé leur propriétaire. Une pièce similaire vous intéresse ?
+        Notre réseau de sourcing nous permet de la retrouver sur demande.
       </p>
     </section>
 
-    <!-- Filtres -->
-    <section class="border-y border-platine/40 bg-ivoire sticky top-20 lg:top-[8.25rem] z-30">
-      <div class="mx-auto max-w-[1400px] px-6 lg:px-12 py-5 flex flex-wrap items-center gap-x-10 gap-y-3">
-        <label class="sr-only" for="f-marque">Marque</label>
-        <select id="f-marque" class="filtre"></select>
-
-        <label class="sr-only" for="f-budget">Budget</label>
-        <select id="f-budget" class="filtre">
-          <option value="">Tous budgets</option>
-          <option value="0-10000">Moins de 10 000 €</option>
-          <option value="10000-20000">10 000 — 20 000 €</option>
-          <option value="20000-40000">20 000 — 40 000 €</option>
-          <option value="40000-999999">Plus de 40 000 €</option>
-        </select>
-
-        <label class="sr-only" for="f-couleur">Couleur du cadran</label>
-        <select id="f-couleur" class="filtre"></select>
-
-        <label class="sr-only" for="f-matiere">Matériau</label>
-        <select id="f-matiere" class="filtre"></select>
-
-        <label class="sr-only" for="f-tri">Trier</label>
-        <select id="f-tri" class="filtre lg:ml-auto">
-          <option value="maison">Sélection de la maison</option>
-          <option value="prix-asc">Prix croissant</option>
-          <option value="prix-desc">Prix décroissant</option>
-          <option value="annee">Année récente</option>
-        </select>
-
-        <button id="f-reset" class="text-[11px] tracking-luxe uppercase text-gris hover:text-noir transition-colors duration-400 border-b border-transparent hover:border-noir pb-px">Réinitialiser</button>
-      </div>
-    </section>
-
     <!-- Résultats -->
-    <section class="mx-auto max-w-[1400px] px-6 lg:px-12 py-14 lg:py-20">
-      <div class="flex flex-wrap items-baseline justify-between gap-4 mb-12">
-        <p id="compteur" class="text-[11px] tracking-luxe uppercase text-gris"></p>
-        <a href="vendues.html" class="text-[11px] tracking-luxe uppercase text-gris hover:text-noir border-b border-transparent hover:border-noir pb-px transition-colors duration-400">Voir nos pièces vendues →</a>
-      </div>
+    <section class="mx-auto max-w-[1400px] px-6 lg:px-12 py-14 lg:py-20 border-t border-platine/40">
+      <p id="compteur" class="text-[11px] tracking-luxe uppercase text-gris mb-12"></p>
 
-      <div id="grille-resultats" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16"></div>
+      <div id="grille-vendues" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16"></div>
 
       <!-- État vide -->
       <div id="etat-vide" class="hidden py-20 max-w-2xl">
-        <h2 id="vide-titre" class="font-serif font-light tracking-tight" style="font-size: clamp(1.8rem, 3.5vw, 3rem);"></h2>
+        <h2 class="font-serif font-light tracking-tight" style="font-size: clamp(1.8rem, 3.5vw, 3rem);">Nos prochaines références apparaîtront ici.</h2>
         <p class="mt-6 text-gris text-[15px] leading-[1.7]">
-          Notre vitrine évolue chaque semaine et notre réseau de sourcing couvre l'Europe et la Suisse.
-          Décrivez-nous la pièce recherchée : nous vous revenons sous 24 heures avec des propositions.
+          Chaque pièce vendue rejoindra cette page. En attendant, découvrez les montres actuellement disponibles.
         </p>
-        <a id="vide-cta" href="https://wa.me/33600000000" class="btn btn-noir mt-10">Lancer une recherche</a>
+        <a href="collection.html" class="btn btn-noir mt-10">Voir le catalogue</a>
+      </div>
+
+      <div class="mt-20 text-center reveal">
+        <a href="https://wa.me/33600000000?text=Bonjour%2C%20je%20recherche%20une%20montre%20similaire%20%C3%A0%20une%20de%20vos%20pi%C3%A8ces%20vendues." class="btn btn-contour-noir">Rechercher une pièce similaire</a>
       </div>
     </section>
 
@@ -290,7 +233,6 @@
       <a href="index.html" class="font-serif text-lg tracking-logo uppercase">Edo&nbsp;Watches</a>
       <nav class="flex gap-8 text-[11px] tracking-luxe uppercase text-gris" aria-label="Liens du site">
         <a href="collection.html" class="hover:text-noir transition-colors duration-400">Catalogue</a>
-        <a href="vendues.html" class="hover:text-noir transition-colors duration-400">Pièces vendues</a>
         <a href="index.html#vendre" class="hover:text-noir transition-colors duration-400">Vendre</a>
         <a href="index.html#contact" class="hover:text-noir transition-colors duration-400">Contact</a>
       </nav>
@@ -301,97 +243,26 @@
   <script src="montres.js"></script>
   <script src="site.js"></script>
   <script>
-    // ---------- Filtres ----------
-    const selMarque = document.getElementById('f-marque');
-    const selBudget = document.getElementById('f-budget');
-    const selCouleur = document.getElementById('f-couleur');
-    const selMatiere = document.getElementById('f-matiere');
-    const selTri = document.getElementById('f-tri');
+    // ---------- Pièces vendues : alimentées automatiquement par le dashboard ----------
+    // Toute pièce passée au statut « Vendue » dans /admin.html apparaît ici.
+    const vendues = Object.entries(MONTRES).filter(([, m]) => (m.statut || 'disponible') === 'vendue');
 
-    // Marques : les 15 maisons + toute marque présente en stock
-    const marquesStock = [...new Set(Object.values(MONTRES).map(m => m.marque))];
-    const toutesMarques = [...new Set([...MARQUES.map(m => m.nom), ...marquesStock])];
-    selMarque.innerHTML = '<option value="">Toutes les marques</option>' +
-      toutesMarques.map(m => `<option value="${m}">${m}</option>`).join('');
+    document.getElementById('compteur').textContent = vendues.length
+      ? vendues.length + (vendues.length > 1 ? ' pièces vendues' : ' pièce vendue')
+      : '';
+    document.getElementById('etat-vide').classList.toggle('hidden', vendues.length > 0);
 
-    // Couleurs et matériaux : options construites depuis le stock réel
-    const couleursStock = [...new Set(Object.values(MONTRES).map(m => m.couleur).filter(Boolean))];
-    selCouleur.innerHTML = '<option value="">Toutes couleurs de cadran</option>' +
-      couleursStock.map(c => `<option value="${c}">Cadran ${c.toLowerCase()}</option>`).join('');
-    const matieresStock = [...new Set(Object.values(MONTRES).map(m => m.matiere).filter(Boolean))];
-    selMatiere.innerHTML = '<option value="">Tous matériaux</option>' +
-      matieresStock.map(m => `<option value="${m}">${m}</option>`).join('');
-
-    // Pré-filtre depuis l'URL (mega menu)
-    const paramMarque = new URLSearchParams(location.search).get('marque');
-    if (paramMarque && toutesMarques.includes(paramMarque)) selMarque.value = paramMarque;
-
-    const carte = ([slug, m], i) => `
-      <a href="montre.html?m=${slug}" class="carte-produit group block carte-in" style="animation-delay:${Math.min(i * 70, 500)}ms">
+    document.getElementById('grille-vendues').innerHTML = vendues.map(([slug, m], i) => `
+      <a href="montre.html?m=${slug}" class="group block carte-in" style="animation-delay:${Math.min(i * 70, 500)}ms">
         <div class="img-zoom relative aspect-[4/5] bg-white border border-platine/30">
           <img src="${m.image.replace('w=1600', 'w=1200')}" alt="${m.alt}" loading="lazy" class="w-full h-full object-cover">
-          ${m.statut === 'reservee' ? '<span class="absolute top-3 left-3 z-10 bg-ivoire border border-noir text-noir text-[9px] tracking-luxe uppercase px-3 py-1.5">Réservée</span>' : ''}
+          <span class="absolute top-3 left-3 z-10 bg-noir text-ivoire text-[9px] tracking-luxe uppercase px-3 py-1.5">Vendue</span>
         </div>
         <div class="mt-6">
           <h3 class="font-serif text-xl font-normal">${m.marque} ${m.nom}</h3>
           <p class="mt-1 text-[13px] text-gris">${m.sousTitre}</p>
-          <div class="mt-3 flex items-baseline justify-between">
-            <p class="text-[15px] font-light tracking-wide">${m.prix}</p>
-            <span class="decouvrir text-[11px] tracking-luxe uppercase">Découvrir →</span>
-          </div>
         </div>
-      </a>`;
-
-    const rendre = () => {
-      // Les pièces vendues sont regroupées sur vendues.html
-      let entrees = Object.entries(MONTRES).filter(([, m]) => (m.statut || 'disponible') !== 'vendue');
-
-      if (selMarque.value) entrees = entrees.filter(([, m]) => m.marque === selMarque.value);
-      if (selBudget.value) {
-        const [min, max] = selBudget.value.split('-').map(Number);
-        entrees = entrees.filter(([, m]) => m.prixNum >= min && m.prixNum < max);
-      }
-      if (selCouleur.value) entrees = entrees.filter(([, m]) => m.couleur === selCouleur.value);
-      if (selMatiere.value) entrees = entrees.filter(([, m]) => m.matiere === selMatiere.value);
-
-      if (selTri.value === 'prix-asc') entrees.sort((a, b) => a[1].prixNum - b[1].prixNum);
-      if (selTri.value === 'prix-desc') entrees.sort((a, b) => b[1].prixNum - a[1].prixNum);
-      if (selTri.value === 'annee') entrees.sort((a, b) => b[1].annee - a[1].annee);
-
-      const grille = document.getElementById('grille-resultats');
-      const vide = document.getElementById('etat-vide');
-      const compteur = document.getElementById('compteur');
-
-      grille.innerHTML = entrees.map(carte).join('');
-      compteur.textContent = entrees.length
-        ? entrees.length + (entrees.length > 1 ? ' pièces disponibles' : ' pièce disponible')
-        : '';
-      vide.classList.toggle('hidden', entrees.length > 0);
-
-      if (!entrees.length) {
-        const quoi = selMarque.value || 'correspondante';
-        document.getElementById('vide-titre').textContent =
-          'Aucune pièce ' + quoi + ' en vitrine actuellement.';
-        document.getElementById('vide-cta').href =
-          'https://wa.me/33600000000?text=' + encodeURIComponent(
-            'Bonjour, je recherche une montre' + (selMarque.value ? ' ' + selMarque.value : '') + '. Pouvez-vous la sourcer ?');
-      }
-
-      // L'URL reflète le filtre marque (partageable)
-      const url = new URL(location);
-      if (selMarque.value) url.searchParams.set('marque', selMarque.value);
-      else url.searchParams.delete('marque');
-      history.replaceState(null, '', url);
-    };
-
-    [selMarque, selBudget, selCouleur, selMatiere, selTri].forEach(s => s.addEventListener('change', rendre));
-    document.getElementById('f-reset').addEventListener('click', () => {
-      [selMarque, selBudget, selCouleur, selMatiere].forEach(s => s.value = '');
-      selTri.value = 'maison';
-      rendre();
-    });
-
-    rendre();
+      </a>`).join('');
 
     // ---------- Apparition au scroll ----------
     const observer = new IntersectionObserver((entrees) => {

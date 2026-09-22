@@ -11,10 +11,10 @@
   const decl = document.getElementById('decl-mega');
   let megaOuvert = false;
 
-  // Fond du header : transparent sur le hero de l'accueil, noir partout ailleurs
+  // Fond du header : transparent sur le hero de l'accueil, chrome partout ailleurs
   const majFond = () => {
     const solide = !transparent || window.scrollY > 40 || megaOuvert;
-    header.classList.toggle('bg-noir', solide);
+    header.classList.toggle('bg-chrome', solide);
   };
   window.addEventListener('scroll', majFond, { passive: true });
   majFond();
@@ -52,7 +52,7 @@
     if (listeMarques) {
       listeMarques.innerHTML = MARQUES.map(m => `
         <a href="collection.html?marque=${encodeURIComponent(m.nom)}"
-           class="flex items-center gap-3 py-1.5 text-[12px] tracking-wide text-neutral-400 hover:text-ivoire transition-colors duration-400">
+           class="flex items-center gap-3 py-1.5 text-[12px] tracking-wide text-neutral-600 hover:text-noir transition-colors duration-400">
           <img src="${logoMarque(m.domaine)}" alt="" loading="lazy" class="h-4 w-4 object-contain opacity-70">${m.nom}
         </a>`).join('');
     }
@@ -73,7 +73,7 @@
       burger.setAttribute('aria-expanded', o);
       burger.setAttribute('aria-label', o ? 'Fermer le menu' : 'Ouvrir le menu');
       document.body.style.overflow = o ? 'hidden' : '';
-      if (o) header.classList.add('bg-noir');
+      if (o) header.classList.add('bg-chrome');
       else majFond();
     };
     burger.addEventListener('click', () => basculer(menu.classList.contains('hidden')));
