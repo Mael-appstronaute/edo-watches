@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
       '// GÉNÉRÉ à la volée depuis le dashboard (/admin.html).\n' +
       '// ============================================================\n\n' +
       'const MARQUES = ' + JSON.stringify(donnees.marques, null, 2) + ';\n\n' +
-      "const logoMarque = (domaine) => 'https://www.google.com/s2/favicons?domain=' + domaine + '&sz=128';\n\n" +
+      "const logoMarque = (m) => m.logo || ('https://www.google.com/s2/favicons?domain=' + m.domaine + '&sz=128');\n\n" +
       'const MONTRES = ' + JSON.stringify(donnees.montres, null, 2) + ';\n';
     res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');

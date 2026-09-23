@@ -221,7 +221,13 @@
                       <input id="c-marque-domaine" class="champ" placeholder="Site officiel (ex. zenith-watches.com)">
                       <img id="apercu-logo-marque" class="h-6 w-6 object-contain hidden" alt="">
                     </div>
-                    <p class="text-[11px] text-gris">Le logo est récupéré automatiquement depuis le site officiel.</p>
+                    <div class="flex items-center gap-3 flex-wrap">
+                      <button type="button" id="cm-btn-logo" class="btn btn-contour !py-1.5 !px-3 !text-[10px]">Choisir un logo (image)</button>
+                      <img id="cm-logo-apercu" class="h-6 w-6 object-contain hidden" alt="">
+                      <button type="button" id="cm-logo-retirer" class="hidden text-[11px] text-gris hover:text-noir underline">retirer</button>
+                      <input id="cm-logo-fichier" type="file" accept="image/*" class="hidden">
+                    </div>
+                    <p id="cm-logo-etat" class="text-[11px] text-gris">Sans image, le logo est récupéré automatiquement depuis le site officiel.</p>
                     <button type="button" id="btn-creer-marque" class="btn btn-contour !py-2 !px-4">Ajouter la marque</button>
                   </div>
                 </div>
@@ -420,11 +426,13 @@
         </div>
         <p class="mt-8 max-w-xl text-[13px] text-gris leading-relaxed">
           Les maisons alimentent le menu du site et le filtre du catalogue.
-          Le logo est récupéré automatiquement depuis le site officiel : modifiez le domaine pour le corriger.
+          Le logo est récupéré automatiquement depuis le site officiel : modifiez le domaine pour le corriger,
+          ou cliquez sur le logo d'une maison pour téléverser votre propre image.
           Une maison ne peut être retirée que si aucune pièce du catalogue ne l'utilise.
         </p>
 
         <div id="liste-marques" class="mt-12 border-t border-platine/40 max-w-3xl"></div>
+        <input id="logo-marque-fichier" type="file" accept="image/*" class="hidden">
 
         <div class="mt-14 max-w-md border border-platine/50 bg-white p-6">
           <p class="text-[11px] tracking-luxe uppercase mb-5">Ajouter une maison</p>
@@ -434,6 +442,13 @@
               <input id="m-domaine" class="champ" placeholder="Site officiel (ex. zenith-watches.com)">
               <img id="m-apercu-logo" class="h-6 w-6 object-contain hidden" alt="">
             </div>
+            <div class="flex items-center gap-3 flex-wrap">
+              <button type="button" id="m-btn-logo" class="btn btn-contour !py-1.5 !px-3 !text-[10px]">Choisir un logo (image)</button>
+              <img id="m-logo-apercu" class="h-6 w-6 object-contain hidden" alt="">
+              <button type="button" id="m-logo-retirer" class="hidden text-[11px] text-gris hover:text-noir underline">retirer</button>
+              <input id="m-logo-fichier" type="file" accept="image/*" class="hidden">
+            </div>
+            <p id="m-logo-etat" class="text-[11px] text-gris">Sans image, le logo est récupéré automatiquement depuis le site officiel.</p>
             <button id="btn-ajouter-marque" class="btn btn-contour !py-2 !px-4">Ajouter la maison</button>
           </div>
         </div>
@@ -467,6 +482,7 @@
   const $ = (id) => document.getElementById(id);
   const esc = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   const urlLogo = (d) => 'https://www.google.com/s2/favicons?domain=' + d + '&sz=128';
+  const logoDeMarque = (m) => m.logo || urlLogo(m.domaine);
 
   let DONNEES = { marques: [], montres: {} };
   const EST_LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
@@ -477,6 +493,7 @@
   let setItems = [];           // lignes « set & provenance »
   let sousTitreManuel = false; // l'utilisateur a touché le sous-titre
   let matiereManuelle = false; // idem pour la matière (filtre)
+  let marquePourLogo = null;   // maison dont on remplace le logo depuis la liste
 
   const SUGGESTIONS_SET = (annee) => [
     'Boîte et écrin d’origine',
@@ -696,10 +713,13 @@
 
     $('liste-marques').innerHTML = DONNEES.marques.map(m => `
       <div class="ligne-piece grid grid-cols-[40px_1fr_auto] sm:grid-cols-[40px_1fr_220px_auto] items-center gap-5 border-b border-platine/40 py-4 pr-2" data-marque="${esc(m.nom)}">
-        <img src="${urlLogo(m.domaine)}" alt="" class="h-7 w-7 object-contain">
+        <button type="button" class="chg-logo h-10 w-10 flex items-center justify-center border border-transparent hover:border-platine/60 transition-colors"
+                title="Cliquer pour remplacer le logo par une image">
+          <img src="${esc(logoDeMarque(m))}" alt="" class="h-7 w-7 object-contain">
+        </button>
         <div class="min-w-0">
           <p class="font-serif text-lg leading-tight truncate">${esc(m.nom)}</p>
-          <p class="text-[11px] text-gris">${compte[m.nom] || 0} pièce${(compte[m.nom] || 0) > 1 ? 's' : ''} au catalogue</p>
+          <p class="text-[11px] text-gris">${compte[m.nom] || 0} pièce${(compte[m.nom] || 0) > 1 ? 's' : ''} au catalogue${m.logo ? ' · logo personnalisé <button type="button" class="ret-logo underline hover:text-noir">retirer</button>' : ''}</p>
         </div>
         <input class="dom-marque champ hidden sm:block !py-1 text-[12px]" value="${esc(m.domaine)}"
                title="Domaine du site officiel — validez avec Entrée">
@@ -719,6 +739,18 @@
         if (marque && domaine) marque.domaine = domaine.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
         rendreMarques();
         toast('Domaine mis à jour pour ' + nom + ' : le logo du site suivra.');
+      });
+      ligne.querySelector('.chg-logo')?.addEventListener('click', () => {
+        marquePourLogo = nom;
+        $('logo-marque-fichier').click();
+      });
+      ligne.querySelector('.ret-logo')?.addEventListener('click', async () => {
+        const r = await appelApi('/api/marque', 'PUT', { nom, logo: '' });
+        if (!r) return;
+        const marque = DONNEES.marques.find(x => x.nom === nom);
+        if (marque) delete marque.logo;
+        rendreMarques();
+        toast('Logo retiré : retour au logo automatique pour ' + nom + '.');
       });
       ligne.querySelector('.sup-marque')?.addEventListener('click', async () => {
         if (!confirm('Retirer la maison « ' + nom + ' » du menu du site ?')) return;
@@ -920,6 +952,80 @@
     }
     rendrePhotos();
     majApercu();
+  }
+
+  // ---------- Logos de maisons ----------
+  // Redimensionne à 512 px max en PNG (la transparence des logos est conservée)
+  function compresserLogo(fichier) {
+    return new Promise((resoudre) => {
+      if (fichier.size < 300 * 1024) return resoudre({ blob: fichier, nom: fichier.name });
+      const img = new Image();
+      const url = URL.createObjectURL(fichier);
+      img.onload = () => {
+        const ratio = Math.min(1, 512 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * ratio);
+        c.height = Math.round(img.height * ratio);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(
+          (b) => resoudre(b ? { blob: b, nom: fichier.name.replace(/\.[^.]+$/, '') + '.png' } : { blob: fichier, nom: fichier.name }),
+          'image/png'
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resoudre({ blob: fichier, nom: fichier.name }); };
+      img.src = url;
+    });
+  }
+
+  async function televerserLogoMarque(fichier) {
+    if (!fichier || !fichier.type.startsWith('image/')) throw new Error('Choisissez une image.');
+    const { blob, nom } = await compresserLogo(fichier);
+    const entetes = { 'Content-Type': 'application/octet-stream' };
+    const cle = localStorage.getItem('edoCle');
+    if (cle) entetes['x-edo-cle'] = cle;
+    const r = await fetch('/api/upload?nom=' + encodeURIComponent(nom), { method: 'POST', headers: entetes, body: blob });
+    const j = await r.json();
+    if (r.status === 401) {
+      montrerVerrou();
+      throw new Error('Session expirée : reconnectez-vous puis recommencez.');
+    }
+    if (!r.ok) throw new Error(j.erreur || 'Échec du téléversement');
+    return j.url;
+  }
+
+  // Petit composant « logo de la nouvelle maison » (formulaire pièce + vue maisons)
+  function brancherLogoMaison(pfx) {
+    const etat = { url: '' };
+    const apercu = $(pfx + '-logo-apercu');
+    const retirer = $(pfx + '-logo-retirer');
+    const texte = $(pfx + '-logo-etat');
+    const fichier = $(pfx + '-logo-fichier');
+    const maj = () => {
+      apercu.classList.toggle('hidden', !etat.url);
+      if (etat.url) apercu.src = etat.url;
+      retirer.classList.toggle('hidden', !etat.url);
+      texte.textContent = etat.url
+        ? 'Logo téléversé : il remplacera le logo automatique.'
+        : 'Sans image, le logo est récupéré automatiquement depuis le site officiel.';
+    };
+    $(pfx + '-btn-logo').addEventListener('click', () => fichier.click());
+    fichier.addEventListener('change', async (e) => {
+      const f = e.target.files[0];
+      e.target.value = '';
+      if (!f) return;
+      toast('Téléversement du logo…');
+      try {
+        etat.url = await televerserLogoMarque(f);
+        maj();
+        toast('Logo téléversé.');
+      } catch (err) {
+        toast('⚠ ' + err.message);
+      }
+    });
+    retirer.addEventListener('click', () => { etat.url = ''; maj(); });
+    etat.reinitialiser = () => { etat.url = ''; maj(); };
+    return etat;
   }
 
   // ---------- Set & provenance ----------
@@ -1135,17 +1241,23 @@
     img.classList.toggle('hidden', !d);
     if (d) img.src = urlLogo(d);
   });
+  const logoMaisonForm = brancherLogoMaison('cm');
   $('btn-creer-marque').addEventListener('click', async () => {
     const nom = $('c-marque-nom').value.trim();
     if (!nom) return toast('⚠ Indiquez le nom de la maison.');
-    const r = await appelApi('/api/marque', 'POST', { nom, domaine: $('c-marque-domaine').value.trim() });
+    const logo = logoMaisonForm.url;
+    const r = await appelApi('/api/marque', 'POST', { nom, domaine: $('c-marque-domaine').value.trim(), logo });
     if (!r) return;
     if (!DONNEES.marques.some(m => m.nom.toLowerCase() === nom.toLowerCase()))
-      DONNEES.marques.push({ nom, domaine: $('c-marque-domaine').value.trim() || 'watch.com' });
+      DONNEES.marques.push(Object.assign(
+        { nom, domaine: $('c-marque-domaine').value.trim() || 'watch.com' },
+        logo ? { logo } : {}
+      ));
     remplirMarques();
     $('c-marque').value = nom;
     $('bloc-nouvelle-marque').classList.add('hidden');
     $('c-marque-nom').value = ''; $('c-marque-domaine').value = '';
+    logoMaisonForm.reinitialiser();
     majApercu();
     toast('Maison « ' + nom + ' » ajoutée — elle apparaît aussi dans le menu du site.');
   });
@@ -1196,18 +1308,45 @@
     img.classList.toggle('hidden', !d);
     if (d) img.src = urlLogo(d);
   });
+  const logoMaisonVue = brancherLogoMaison('m');
   $('btn-ajouter-marque').addEventListener('click', async () => {
     const nom = $('m-nom').value.trim();
     if (!nom) return toast('⚠ Indiquez le nom de la maison.');
     const domaine = $('m-domaine').value.trim();
-    const r = await appelApi('/api/marque', 'POST', { nom, domaine });
+    const logo = logoMaisonVue.url;
+    const r = await appelApi('/api/marque', 'POST', { nom, domaine, logo });
     if (!r) return;
     if (!DONNEES.marques.some(m => m.nom.toLowerCase() === nom.toLowerCase()))
-      DONNEES.marques.push({ nom, domaine: domaine.replace(/^https?:\/\/(www\.)?/, '').split('/')[0] || 'watch.com' });
+      DONNEES.marques.push(Object.assign(
+        { nom, domaine: domaine.replace(/^https?:\/\/(www\.)?/, '').split('/')[0] || 'watch.com' },
+        logo ? { logo } : {}
+      ));
     remplirMarques();
     rendreMarques();
     $('m-nom').value = ''; $('m-domaine').value = ''; $('m-apercu-logo').classList.add('hidden');
+    logoMaisonVue.reinitialiser();
     toast('Maison « ' + nom + ' » ajoutée : elle apparaît dans le menu du site.');
+  });
+
+  // Remplacement du logo d'une maison existante (clic sur le logo dans la liste)
+  $('logo-marque-fichier').addEventListener('change', async (e) => {
+    const f = e.target.files[0];
+    e.target.value = '';
+    const nom = marquePourLogo;
+    marquePourLogo = null;
+    if (!f || !nom) return;
+    toast('Téléversement du logo…');
+    try {
+      const url = await televerserLogoMarque(f);
+      const r = await appelApi('/api/marque', 'PUT', { nom, logo: url });
+      if (!r) return;
+      const marque = DONNEES.marques.find(x => x.nom === nom);
+      if (marque) marque.logo = url;
+      rendreMarques();
+      toast('Logo mis à jour pour ' + nom + ' : le site suivra.');
+    } catch (err) {
+      toast('⚠ ' + err.message);
+    }
   });
 
   // Verrou : connexion identifiant + mot de passe

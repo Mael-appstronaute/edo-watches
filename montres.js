@@ -67,7 +67,7 @@ const MARQUES = [
   }
 ];
 
-const logoMarque = (domaine) => 'https://www.google.com/s2/favicons?domain=' + domaine + '&sz=128';
+const logoMarque = (m) => m.logo || ('https://www.google.com/s2/favicons?domain=' + m.domaine + '&sz=128');
 
 const MONTRES = {
   "daytona": {

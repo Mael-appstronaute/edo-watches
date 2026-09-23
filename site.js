@@ -25,7 +25,7 @@
     grille.innerHTML = MARQUES.map(m => `
       <a href="collection.html?marque=${encodeURIComponent(m.nom)}"
          class="group flex flex-col items-center justify-center gap-3 border-r border-b border-platine/30 py-7 px-3 bg-ivoire hover:bg-white transition-colors duration-500">
-        <img src="${logoMarque(m.domaine)}" alt="Logo ${m.nom}" loading="lazy"
+        <img src="${logoMarque(m)}" alt="Logo ${m.nom}" loading="lazy"
              class="h-7 w-7 object-contain opacity-75 group-hover:opacity-100 transition-opacity duration-500">
         <span class="text-[10px] tracking-[0.18em] uppercase text-center leading-tight">${m.nom}</span>
       </a>`).join('');
@@ -53,7 +53,7 @@
       listeMarques.innerHTML = MARQUES.map(m => `
         <a href="collection.html?marque=${encodeURIComponent(m.nom)}"
            class="flex items-center gap-3 py-1.5 text-[12px] tracking-wide text-neutral-600 hover:text-noir transition-colors duration-400">
-          <img src="${logoMarque(m.domaine)}" alt="" loading="lazy" class="h-4 w-4 object-contain opacity-70">${m.nom}
+          <img src="${logoMarque(m)}" alt="" loading="lazy" class="h-4 w-4 object-contain opacity-70">${m.nom}
         </a>`).join('');
     }
     // Accordéon marques (mega menu version mobile)

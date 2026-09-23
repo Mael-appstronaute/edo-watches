@@ -46,7 +46,7 @@ def regenerer_js(donnees):
         "// Ne pas éditer à la main : passer par le dashboard (/admin.html).\n"
         "// ============================================================\n\n"
         f"const MARQUES = {marques};\n\n"
-        "const logoMarque = (domaine) => 'https://www.google.com/s2/favicons?domain=' + domaine + '&sz=128';\n\n"
+        "const logoMarque = (m) => m.logo || ('https://www.google.com/s2/favicons?domain=' + m.domaine + '&sz=128');\n\n"
         f"const MONTRES = {montres};\n"
     )
     with open(FICHIER_JS, 'w', encoding='utf-8') as f:
@@ -149,6 +149,12 @@ class Requete(SimpleHTTPRequestHandler):
                     return self.repondre_json({'erreur': 'Marque introuvable'}, 404)
                 if domaine:
                     marque['domaine'] = domaine
+                if 'logo' in corps:
+                    logo = (corps.get('logo') or '').strip()
+                    if logo:
+                        marque['logo'] = logo
+                    else:
+                        marque.pop('logo', None)
                 sauvegarder(donnees)
                 return self.repondre_json({'ok': True})
             except Exception as e:
@@ -200,7 +206,11 @@ class Requete(SimpleHTTPRequestHandler):
         donnees = charger()
         if any(m['nom'].lower() == nom.lower() for m in donnees['marques']):
             return self.repondre_json({'ok': True, 'existante': True})
-        donnees['marques'].append({'nom': nom, 'domaine': domaine or 'watch.com'})
+        marque = {'nom': nom, 'domaine': domaine or 'watch.com'}
+        logo = (corps.get('logo') or '').strip()
+        if logo:
+            marque['logo'] = logo
+        donnees['marques'].append(marque)
         sauvegarder(donnees)
         self.repondre_json({'ok': True})
 

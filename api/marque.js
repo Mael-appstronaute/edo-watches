@@ -1,5 +1,5 @@
-// POST   /api/marque          — ajout d'une maison {nom, domaine}
-// PUT    /api/marque          — mise à jour du domaine {nom, domaine}
+// POST   /api/marque          — ajout d'une maison {nom, domaine, logo?}
+// PUT    /api/marque          — mise à jour {nom, domaine?, logo?} (logo: '' = retour au logo auto)
 // DELETE /api/marque?nom=…    — suppression (refusée si des pièces l'utilisent)
 const { chargerDonnees, sauvegarderDonnees, verifierCle } = require('./_depot.js');
 
@@ -21,12 +21,20 @@ module.exports = async (req, res) => {
       if (req.method === 'PUT') {
         if (!existante) return res.status(404).json({ erreur: 'Marque introuvable' });
         existante.domaine = domaine || existante.domaine;
+        if (typeof corps.logo === 'string') {
+          const logo = corps.logo.trim();
+          if (logo) existante.logo = logo;
+          else delete existante.logo;
+        }
         await sauvegarderDonnees(donnees);
         return res.status(200).json({ ok: true });
       }
 
       if (existante) return res.status(200).json({ ok: true, existante: true });
-      donnees.marques.push({ nom, domaine: domaine || 'watch.com' });
+      const marque = { nom, domaine: domaine || 'watch.com' };
+      const logo = typeof corps.logo === 'string' ? corps.logo.trim() : '';
+      if (logo) marque.logo = logo;
+      donnees.marques.push(marque);
       await sauvegarderDonnees(donnees);
       return res.status(200).json({ ok: true });
     }
