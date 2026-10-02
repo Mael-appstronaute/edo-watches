@@ -121,10 +121,6 @@
     <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
       <div class="grid grid-cols-[1fr_auto_1fr] items-center h-20 lg:h-24">
         <nav class="hidden xl:flex items-center gap-4 text-[10px] tracking-[0.14em] uppercase" aria-label="Navigation principale">
-          <button id="decl-mega" class="lien-nav flex items-center gap-2 uppercase tracking-[0.14em]" aria-expanded="false" aria-controls="mega">
-            Nos marques
-            <svg class="chevron" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1"><path d="m2 3.5 3 3 3-3"/></svg>
-          </button>
           <a href="collection.html" class="lien-nav">Catalogue</a>
           <a href="vendues.html" class="lien-nav flex items-center gap-2">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.3 2.3 4.7-4.6"/></svg>
@@ -144,6 +140,7 @@
 
         <div class="flex items-center justify-end gap-6">
           <a href="index.html#contact" class="hidden xl:inline-block text-[11px] tracking-luxe uppercase border-b border-noir/40 pb-1 hover:border-noir hover:text-gris transition-colors duration-400">Prendre rendez-vous</a>
+          <button id="lang-toggle" class="flex items-center gap-2 text-[10px] tracking-[0.18em] uppercase hover:text-gris transition-colors duration-400"></button>
           <a href="https://www.instagram.com/edo_watches" target="_blank" rel="noopener" class="hover:text-gris transition-colors duration-400" aria-label="Nous suivre sur Instagram">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg>
           </a>
@@ -154,37 +151,18 @@
       </div>
     </div>
 
-    <!-- Mega menu marques -->
-    <div id="mega" class="mega hidden xl:block absolute inset-x-0 top-full bg-chrome text-noir border-b border-platine/40 max-h-[calc(100vh-8.25rem)] overflow-y-auto">
-      <div class="mx-auto max-w-[1400px] px-8 lg:px-12 py-14 grid lg:grid-cols-[260px_1fr] gap-10 xl:gap-16 items-start">
-        <div>
-          <p class="text-[11px] tracking-luxe uppercase text-gris mb-6">Nos marques</p>
-          <p class="font-serif text-3xl font-light leading-snug">Les plus grandes maisons, authentifiées.</p>
-          <p class="mt-5 text-[13px] text-gris leading-[1.7]">Chaque pièce est expertisée par nos horlogers. Une référence vous échappe ? Nous la sourçons.</p>
-          <a href="collection.html" class="inline-block mt-8 text-[11px] tracking-luxe uppercase border-b border-noir pb-1 hover:text-gris hover:border-gris transition-colors duration-400">Voir tout le catalogue →</a>
-        </div>
-        <div id="mega-grille" class="grid grid-cols-3 xl:grid-cols-5 border-l border-t border-platine/30"></div>
-      </div>
-    </div>
   </header>
 
   <!-- Menu mobile plein écran -->
   <div id="menu-mobile" class="fixed inset-0 z-40 bg-chrome text-noir flex-col hidden overflow-y-auto" role="dialog" aria-label="Menu">
     <div class="pt-28 pb-16 px-8">
       <nav class="flex flex-col gap-7">
-        <button id="decl-marques-mobile" class="flex items-center justify-between w-full text-left font-serif text-3xl font-light" aria-expanded="false" aria-controls="sous-marques">
-          Nos marques
-          <svg class="chevron" width="14" height="14" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1"><path d="m2 3.5 3 3 3-3"/></svg>
-        </button>
-        <div id="sous-marques" class="hidden -mt-3">
-          <div id="marques-mobile" class="grid grid-cols-2 gap-x-6"></div>
-          <a href="collection.html" class="inline-block mt-5 text-[11px] tracking-luxe uppercase border-b border-noir/40 pb-1">Voir tout le catalogue &#8594;</a>
-        </div>
         <a href="collection.html" class="font-serif text-3xl font-light">Catalogue</a>
         <a href="vendues.html" class="font-serif text-3xl font-light">Pièces vendues</a>
         <a href="index.html#maison" class="font-serif text-3xl font-light">La Maison</a>
         <a href="index.html#vendre" class="font-serif text-3xl font-light">Vendre sa montre</a>
         <a href="index.html#contact" class="font-serif text-3xl font-light">Contact</a>
+        <button id="lang-toggle-mobile" class="flex items-center gap-4 text-left font-serif text-3xl font-light"></button>
       </nav>
       <p class="text-[11px] tracking-luxe uppercase text-gris mt-12">Aix-en-Provence et alentours — sur rendez-vous</p>
     </div>
@@ -221,7 +199,7 @@
       </div>
 
       <div class="mt-20 text-center reveal">
-        <a href="https://wa.me/33609078885?text=Bonjour%2C%20je%20recherche%20une%20montre%20similaire%20%C3%A0%20une%20de%20vos%20pi%C3%A8ces%20vendues." class="btn btn-contour-noir">Rechercher une pièce similaire</a>
+        <a href="https://wa.me/33609078885?text=Bonjour%2C%20je%20recherche%20une%20montre%20similaire%20%C3%A0%20une%20de%20vos%20pi%C3%A8ces%20vendues." data-wa-en="Hello, I am looking for a watch similar to one of your sold pieces." class="btn btn-contour-noir">Rechercher une pièce similaire</a>
       </div>
     </section>
 
